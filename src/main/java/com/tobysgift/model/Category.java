@@ -1,13 +1,19 @@
 package com.tobysgift.model;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Entità che rappresenta una categoria di prodotti.
- */
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+
+
 @Entity
 @Table(name = "categories")
 public class Category {
@@ -26,23 +32,22 @@ public class Category {
     private List<Product> prodotti = new ArrayList<>();
     
     /**
-     * Costruttore di default.
+     * Costruttore  default
      */
     public Category() {
     }
     
     /**
-     * Costruttore con parametri.
+     * Costruttore con i paramnetri
      * 
-     * @param nome Il nome della categoria
-     * @param descrizione La descrizione della categoria
+     * @param nome  nome categoria
+     * @param descrizione descrizione categoria
      */
     public Category(String nome, String descrizione) {
         this.nome = nome;
         this.descrizione = descrizione;
     }
     
-    // Getters e Setters
     
     public Long getId() {
         return id;
@@ -77,9 +82,9 @@ public class Category {
     }
     
     /**
-     * Aggiunge un prodotto alla categoria.
+     * per aggiungere un prodotto a una categoria sicrea il metodo addProduct
      * 
-     * @param product Il prodotto da aggiungere
+     * @param product prodotto da aggiungere
      */
     public void addProduct(Product product) {
         prodotti.add(product);
@@ -87,15 +92,17 @@ public class Category {
     }
     
     /**
-     * Rimuove un prodotto dalla categoria.
+     * per rimuovere un prodotto dalla categoria si creal il metodo removeProduct()
      * 
-     * @param product Il prodotto da rimuovere
+     * @param product prodotto da rimuovere
      */
     public void removeProduct(Product product) {
         prodotti.remove(product);
         product.setCategoria(null);
     }
-    
+    /*
+     * toString per stampare Category e convertirla en stringa, perche senza si ottiene l'indirizzo dell'oggetto
+     */
     @Override
     public String toString() {
         return "Category{" +

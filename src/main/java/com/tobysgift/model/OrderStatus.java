@@ -1,8 +1,6 @@
 package com.tobysgift.model;
 
-/**
- * Enum che definisce i possibili stati di un ordine.
- */
+
 public enum OrderStatus {
     CREATO("Creato"),
     PAGAMENTO_IN_ATTESA("Pagamento in attesa"),

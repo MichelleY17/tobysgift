@@ -14,9 +14,6 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 
-/**
- * Entità che rappresenta un post del blog.
- */
 @Entity
 @Table(name = "posts")
 public class Post {
@@ -45,19 +42,17 @@ public class Post {
     @JoinColumn(name = "categoria_id", nullable = false)
     private PostCategory categoria;
     
-    /**
-     * Costruttore di default.
-     */
+ 
     public Post() {
     }
     
     /**
-     * Costruttore con parametri principali.
+     * Costruttore con parametri principali
      * 
-     * @param titolo Il titolo del post
-     * @param contenuto Il contenuto del post
-     * @param autore L'autore del post
-     * @param categoria La categoria del post
+     * @param titolo titolo del post
+     * @param contenuto contenuto del post
+     * @param autore autore del post
+     * @param categoria categoria del post
      */
     public Post(String titolo, String contenuto, User autore, PostCategory categoria) {
         this.titolo = titolo;
@@ -68,7 +63,7 @@ public class Post {
     }
     
     /**
-     * Metodo invocato prima del persist per impostare la data di creazione.
+     * Metodo invocato prima del persist per impostare la data di creazione
      */
     @PrePersist
     protected void onCreate() {
@@ -76,8 +71,6 @@ public class Post {
             this.dataCreazione = LocalDateTime.now();
         }
     }
-    
-    // Getters e Setters
     
     public Long getId() {
         return id;
@@ -136,10 +129,10 @@ public class Post {
     }
     
     /**
-     * Ottiene un estratto del contenuto per l'anteprima.
+     * per ottenere un estratto del contenuto per l'anteprima
      * 
-     * @param length La lunghezza massima dell'estratto
-     * @return Un estratto del contenuto
+     * @param length lunghezza massima dell'estratto
+     * @return estratto  contenuto
      */
     public String getEstratto(int length) {
         if (contenuto.length() <= length) {

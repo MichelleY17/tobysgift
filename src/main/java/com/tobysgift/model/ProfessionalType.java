@@ -1,13 +1,18 @@
 package com.tobysgift.model;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Entità che rappresenta un tipo di professionista.
- */
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+
 @Entity
 @Table(name = "professional_types")
 public class ProfessionalType {
@@ -24,25 +29,21 @@ public class ProfessionalType {
     
     @OneToMany(mappedBy = "tipo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Professional> professionals = new ArrayList<>();
-    
-    /**
-     * Costruttore di default.
-     */
+
     public ProfessionalType() {
     }
     
     /**
-     * Costruttore con parametri.
+     * Costruttore con parametri
      * 
-     * @param nome Il nome del tipo di professionista
-     * @param descrizione La descrizione del tipo
+     * @param nome  nome del tipo di professionista
+     * @param descrizione descrizione del tipo
      */
     public ProfessionalType(String nome, String descrizione) {
         this.nome = nome;
         this.descrizione = descrizione;
     }
     
-    // Getters e Setters
     
     public Long getId() {
         return id;
@@ -77,9 +78,9 @@ public class ProfessionalType {
     }
     
     /**
-     * Aggiunge un professionista a questo tipo.
+     * per aggiungere  un professionista a questo tipo
      * 
-     * @param professional Il professionista da aggiungere
+     * @param professional professionista da aggiungere
      */
     public void addProfessional(Professional professional) {
         professionals.add(professional);
@@ -87,9 +88,9 @@ public class ProfessionalType {
     }
     
     /**
-     * Rimuove un professionista da questo tipo.
+     * rimuove  professionista da questo tipo
      * 
-     * @param professional Il professionista da rimuovere
+     * @param professional professionista da rimuovere
      */
     public void removeProfessional(Professional professional) {
         professionals.remove(professional);

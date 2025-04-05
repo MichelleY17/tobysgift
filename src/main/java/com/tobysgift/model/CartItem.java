@@ -14,9 +14,6 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
-/**
- * Entità che rappresenta un elemento nel carrello di un utente.
- */
 @Entity
 @Table(name = "cart_items")
 public class CartItem {
@@ -40,18 +37,15 @@ public class CartItem {
     @Column(name = "prezzo_unitario", nullable = false)
     private BigDecimal prezzoUnitario;
     
-    /**
-     * Costruttore di default.
-     */
     public CartItem() {
     }
     
     /**
-     * Costruttore con parametri.
+     * Costruttore con parametri
      * 
-     * @param cart Il carrello a cui appartiene questo elemento
-     * @param product Il prodotto
-     * @param quantita La quantità
+     * @param cart carello del quale fa parte cartItem
+     * @param product prodotto
+     * @param quantita quantità
      */
     public CartItem(Cart cart, Product product, int quantita) {
         this.cart = cart;
@@ -60,7 +54,7 @@ public class CartItem {
         this.prezzoUnitario = product.getPrezzo();
     }
     
-    // Getters e Setters
+
     
     public Long getId() {
         return id;
@@ -106,9 +100,9 @@ public class CartItem {
     }
     
     /**
-     * Calcola il prezzo totale dell'elemento del carrello.
+     * calcola il prezzo totale dell'elemento del carrello 
      * 
-     * @return Il prezzo totale (prezzo unitario * quantità)
+     * @return restitutisce = totale (prezzo unitario * quantità)
      */
     public BigDecimal getPrezzoTotale() {
         return prezzoUnitario.multiply(BigDecimal.valueOf(quantita));

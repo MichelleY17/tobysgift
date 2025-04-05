@@ -16,9 +16,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
-/**
- * Entità che rappresenta un prodotto in vendita.
- */
 @Entity
 @Table(name = "products")
 public class Product {
@@ -47,20 +44,17 @@ public class Product {
     @JoinColumn(name = "categoria_id", nullable = false)
     private Category categoria;
     
-    /**
-     * Costruttore di default.
-     */
     public Product() {
     }
     
     /**
-     * Costruttore con parametri principali.
+     * Costruttore con parametri 
      * 
-     * @param nome Il nome del prodotto
-     * @param descrizione La descrizione del prodotto
-     * @param prezzo Il prezzo del prodotto
-     * @param quantitaDisponibile La quantità disponibile
-     * @param categoria La categoria del prodotto
+     * @param nome nome del prodotto
+     * @param descrizione descrizione del prodotto
+     * @param prezzo prezzo del prodotto
+     * @param quantitaDisponibile quantità disponibile
+     * @param categoria categoria del prodotto
      */
     public Product(String nome, String descrizione, BigDecimal prezzo, int quantitaDisponibile, Category categoria) {
         this.nome = nome;
@@ -70,7 +64,6 @@ public class Product {
         this.categoria = categoria;
     }
     
-    // Getters e Setters
     
     public Long getId() {
         return id;
@@ -129,9 +122,9 @@ public class Product {
     }
     
     /**
-     * Verifica se il prodotto è disponibile.
+     * per verificare che il prodotto è disponibile uso il metodo isDisponibile()
      * 
-     * @return true se la quantità disponibile è maggiore di 0, false altrimenti
+     * @return true = quantità disponibile maggiore di 0 //   false = se è minore a 0
      */
     public boolean isDisponibile() {
         return quantitaDisponibile > 0;

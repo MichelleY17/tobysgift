@@ -1,8 +1,5 @@
 package com.tobysgift.model;
 
-/**
- * Enum che definisce i possibili stati di un appuntamento.
- */
 public enum AppointmentStatus {
     RICHIESTO("Richiesto"),
     CONFERMATO("Confermato"),

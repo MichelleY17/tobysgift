@@ -13,9 +13,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 
-/**
- * Entità che rappresenta una categoria di post.
- */
+
 @Entity
 @Table(name = "post_categories")
 public class PostCategory {
@@ -33,24 +31,22 @@ public class PostCategory {
     @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts = new ArrayList<>();
     
-    /**
-     * Costruttore di default.
-     */
+
     public PostCategory() {
     }
     
     /**
-     * Costruttore con parametri.
+     * Costruttore con parametri
      * 
-     * @param nome Il nome della categoria
-     * @param descrizione La descrizione della categoria
+     * @param nome nome della categoria
+     * @param descrizione descrizione della categoria
      */
     public PostCategory(String nome, String descrizione) {
         this.nome = nome;
         this.descrizione = descrizione;
     }
     
-    // Getters e Setters
+
     
     public Long getId() {
         return id;
@@ -85,9 +81,9 @@ public class PostCategory {
     }
     
     /**
-     * Aggiunge un post alla categoria.
+     *  per aggiungere un post alla categoria
      * 
-     * @param post Il post da aggiungere
+     * @param post post da aggiungere
      */
     public void addPost(Post post) {
         posts.add(post);
@@ -95,9 +91,9 @@ public class PostCategory {
     }
     
     /**
-     * Rimuove un post dalla categoria.
+     * per rimuovere un post dalla categoria
      * 
-     * @param post Il post da rimuovere
+     * @param post post da rimuovere
      */
     public void removePost(Post post) {
         posts.remove(post);

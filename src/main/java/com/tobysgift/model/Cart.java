@@ -1,13 +1,20 @@
 package com.tobysgift.model;
 
-import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Entità che rappresenta il carrello di un utente.
- */
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+
 @Entity
 @Table(name = "carts")
 public class Cart {
@@ -25,23 +32,19 @@ public class Cart {
     
     @Column(nullable = false)
     private BigDecimal totale = BigDecimal.ZERO;
-    
-    /**
-     * Costruttore di default.
-     */
+
     public Cart() {
     }
     
     /**
-     * Costruttore con utente.
+     * construttore con parametro utente perche l'utente è proprietario del carello
      * 
-     * @param user L'utente proprietario del carrello
+     * @param user utente proprietario del carrello
      */
     public Cart(User user) {
         this.user = user;
     }
-    
-    // Getters e Setters
+
     
     public Long getId() {
         return id;
@@ -76,51 +79,51 @@ public class Cart {
     }
     
     /**
-     * Aggiunge un prodotto al carrello.
+     * metodo per aggiungere un prodotto al carello e quantita
      * 
-     * @param product Il prodotto da aggiungere
-     * @param quantita La quantità da aggiungere
-     * @return L'elemento del carrello creato o aggiornato
+     * @param product prodotto da aggiungere
+     * @param quantitan quantita da aggiungere
+     * @return restituire  carrello creato o aggiornato
      */
     public CartItem addProduct(Product product, int quantita) {
-        // Cerca se il prodotto è già nel carrello
+        // il prodotto è nel carello?
         for (CartItem item : items) {
             if (item.getProduct().getId().equals(product.getId())) {
-                // Aggiorna la quantità
+                // aggiorna la quantità
                 item.setQuantita(item.getQuantita() + quantita);
-                // Ricalcola il totale del carrello
+                // Ricalcola totale carrello
                 calcolaTotale();
                 return item;
             }
         }
         
-        // Se il prodotto non è nel carrello, crea un nuovo CartItem
+        // se non è nel carrello... crea un nuovo CartItem
         CartItem cartItem = new CartItem(this, product, quantita);
         items.add(cartItem);
         
-        // Ricalcola il totale del carrello
+        // Ricalcola totale del carrello
         calcolaTotale();
         
         return cartItem;
     }
     
     /**
-     * Rimuove un elemento dal carrello.
+     * Rimuove elemento dal carrello
      * 
-     * @param cartItem L'elemento da rimuovere
+     * @param cartItem elemento da rimuovere
      */
     public void removeItem(CartItem cartItem) {
         items.remove(cartItem);
         
-        // Ricalcola il totale del carrello
+        // Ricalcola totale  carrello
         calcolaTotale();
     }
     
     /**
-     * Rimuove un prodotto dal carrello.
+     * Rimuove un prodotto dal carrello, serve:
      * 
-     * @param productId L'ID del prodotto da rimuovere
-     * @return true se il prodotto è stato rimosso, false se non era presente
+     * @param productId ID del prodotto da rimuovere
+     * @return  true  = prodotto è stato rimosso //  false = non era presente
      */
     public boolean removeProduct(Long productId) {
         for (CartItem item : items) {
@@ -134,11 +137,10 @@ public class Cart {
     }
     
     /**
-     * Aggiorna la quantità di un prodotto nel carrello.
+     * aggiorna quantità di un prodotto nel carrello metodo updateQuantity()
      * 
-     * @param productId L'ID del prodotto da aggiornare
-     * @param quantita La nuova quantità
-     * @return true se l'aggiornamento è avvenuto, false se il prodotto non è nel carrello
+     * @param productId ID del prodotto da aggiornare
+     * @param quantita true = nuova quantità // false = prodotto non è nel carrello
      */
     public boolean updateQuantity(Long productId, int quantita) {
         if (quantita <= 0) {
@@ -156,7 +158,7 @@ public class Cart {
     }
     
     /**
-     * Calcola il totale del carrello in base agli elementi presenti.
+     * Calcola  totale del carrello in base agli elementi presenti
      */
     public void calcolaTotale() {
         BigDecimal nuovoTotale = BigDecimal.ZERO;
@@ -167,7 +169,7 @@ public class Cart {
     }
     
     /**
-     * Svuota il carrello.
+     * svuota carrello
      */
     public void svuota() {
         items.clear();
@@ -175,18 +177,18 @@ public class Cart {
     }
     
     /**
-     * Conta il numero di elementi nel carrello.
+     * Conta numero  elementi nel carrello
      * 
-     * @return Il numero di elementi
+     * @return restituire numero di elementi
      */
     public int getItemCount() {
         return items.size();
     }
     
     /**
-     * Conta il numero totale di prodotti nel carrello (somma delle quantità).
+     * somma  totale dei prodotti nel carrello 
      * 
-     * @return Il numero totale di prodotti
+     * @return restituisce  totale 
      */
     public int getTotalProductCount() {
         int count = 0;

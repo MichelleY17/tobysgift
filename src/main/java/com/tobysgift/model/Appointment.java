@@ -16,9 +16,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 
-/**
- * Entità che rappresenta un appuntamento con un professionista.
- */
+
 @Entity
 @Table(name = "appointments")
 public class Appointment {
@@ -45,19 +43,16 @@ public class Appointment {
     
     @Enumerated(EnumType.STRING)
     private AppointmentStatus status = AppointmentStatus.RICHIESTO;
-    
-    /**
-     * Costruttore di default.
-     */
+
     public Appointment() {
     }
     
     /**
-     * Costruttore con parametri principali.
+     * Costruttore con parametri principali
      * 
-     * @param user L'utente che ha richiesto l'appuntamento
-     * @param professional Il professionista con cui è stato richiesto l'appuntamento
-     * @param dataOra La data e ora dell'appuntamento
+     * @param user utente che ha richiesto l'appuntamento
+     * @param professional professionista con cui è stato richiesto l'appuntamento
+     * @param dataOra data e ora dell'appuntamento
      */
     public Appointment(User user, Professional professional, LocalDateTime dataOra) {
         this.user = user;
@@ -66,12 +61,12 @@ public class Appointment {
     }
     
     /**
-     * Costruttore completo.
+     * Costruttore completo
      * 
-     * @param user L'utente che ha richiesto l'appuntamento
-     * @param professional Il professionista con cui è stato richiesto l'appuntamento
-     * @param dataOra La data e ora dell'appuntamento
-     * @param note Le note aggiuntive
+     * @param user utente che ha richiesto l'appuntamento
+     * @param professional professionista con cui è stato richiesto l'appuntamento
+     * @param dataOra  data e ora dell'appuntamento
+     * @param note  note aggiuntive
      */
     public Appointment(User user, Professional professional, LocalDateTime dataOra, String note) {
         this.user = user;
@@ -80,7 +75,7 @@ public class Appointment {
         this.note = note;
     }
     
-    // Getters e Setters
+
     
     public Long getId() {
         return id;
@@ -131,28 +126,28 @@ public class Appointment {
     }
     
     /**
-     * Verifica se l'appuntamento è già passato.
+     * per verificare se l'appuntamneto  è già passato uso il metodo isPassato()
      * 
-     * @return true se la data dell'appuntamento è passata, false altrimenti
+     * @return true =  la data dell'appuntamento è passata //false  = appuntamneto da svolgersi
      */
     public boolean isPassato() {
         return dataOra.isBefore(LocalDateTime.now());
     }
     
     /**
-     * Verifica se l'appuntamento è annullabile.
-     * Gli appuntamenti sono annullabili solo se sono nello stato RICHIESTO o CONFERMATO e non sono già passati.
+     *  per vedere se si puo annullare l'appuntamneto  si devono verificare queste condizioni:
+     *  sono nello stato: RICHIESTO o CONFERMATO e non sono già passati
      * 
-     * @return true se l'appuntamento è annullabile, false altrimenti
+     * @return restituisce true = appuntamento  annullabile //false = lo stato dell'appuntamento è passato
      */
     public boolean isAnnullabile() {
         return (status == AppointmentStatus.RICHIESTO || status == AppointmentStatus.CONFERMATO) && !isPassato();
     }
     
     /**
-     * Conferma l'appuntamento.
+     * conferma appuntamento
      * 
-     * @return true se l'operazione è andata a buon fine, false se l'appuntamento non può essere confermato
+     * @return true = operazione è andata a buon fine // false =  non può essere confermato
      */
     public boolean conferma() {
         if (status == AppointmentStatus.RICHIESTO && !isPassato()) {
@@ -163,9 +158,9 @@ public class Appointment {
     }
     
     /**
-     * Completa l'appuntamento.
+     * Completa l'appuntamento
      * 
-     * @return true se l'operazione è andata a buon fine, false se l'appuntamento non può essere completato
+     * @return true = l'operazione è andata a buon fine // false = l'appuntamento non può essere completato
      */
     public boolean completa() {
         if (status == AppointmentStatus.CONFERMATO) {
@@ -176,9 +171,9 @@ public class Appointment {
     }
     
     /**
-     * Annulla l'appuntamento.
+     * annulla appuntamento
      * 
-     * @return true se l'operazione è andata a buon fine, false se l'appuntamento non può essere annullato
+     * @return true = l'operazione è andata a buon fine // false = l'appuntamento non può essere annullato
      */
     public boolean annulla() {
         if (isAnnullabile()) {

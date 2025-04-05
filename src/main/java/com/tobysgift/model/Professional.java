@@ -1,14 +1,22 @@
 package com.tobysgift.model;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Entità che rappresenta un professionista.
- */
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
 @Entity
 @Table(name = "professionals")
 public class Professional {
@@ -43,14 +51,11 @@ public class Professional {
     @OneToMany(mappedBy = "professional", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Appointment> appointments = new ArrayList<>();
     
-    /**
-     * Costruttore di default.
-     */
     public Professional() {
     }
     
     /**
-     * Costruttore con parametri principali.
+     * Costruttore con parametri principali
      * 
      * @param nome Il nome del professionista
      * @param cognome Il cognome del professionista
@@ -63,9 +68,6 @@ public class Professional {
         this.email = email;
         this.tipo = tipo;
     }
-    
-    // Getters e Setters
-    
     public Long getId() {
         return id;
     }
@@ -147,16 +149,16 @@ public class Professional {
     }
     
     /**
-     * Ottiene il nome completo del professionista.
+     * per ottenere il nome completo del professionista
      * 
-     * @return Nome e cognome concatenati
+     * @return restituisce: nome e cognome concatenati
      */
     public String getNomeCompleto() {
         return nome + " " + cognome;
     }
     
     /**
-     * Aggiunge un appuntamento a questo professionista.
+     * per aggiungere un appuntamento al professionista 
      * 
      * @param appointment L'appuntamento da aggiungere
      */
@@ -166,9 +168,9 @@ public class Professional {
     }
     
     /**
-     * Rimuove un appuntamento da questo professionista.
+     * per rimuovere un appuntamento al professionista
      * 
-     * @param appointment L'appuntamento da rimuovere
+     * @param appointment appuntamento da rimuovere
      */
     public void removeAppointment(Appointment appointment) {
         appointments.remove(appointment);

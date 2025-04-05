@@ -14,9 +14,6 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
-/**
- * Entità che rappresenta un elemento di un ordine.
- */
 @Entity
 @Table(name = "order_items")
 public class OrderItem {
@@ -40,18 +37,15 @@ public class OrderItem {
     @Column(name = "prezzo_unitario", nullable = false)
     private BigDecimal prezzoUnitario;
     
-    /**
-     * Costruttore di default.
-     */
     public OrderItem() {
     }
     
     /**
-     * Costruttore con parametri.
+     * Costruttore semplice con parametri
      * 
-     * @param order L'ordine a cui appartiene questo elemento
-     * @param product Il prodotto
-     * @param quantita La quantità
+     * @param order ordine a cui appartiene questo elemento
+     * @param product prodotto
+     * @param quantita  quantità
      */
     public OrderItem(Order order, Product product, int quantita) {
         this.order = order;
@@ -61,11 +55,11 @@ public class OrderItem {
     }
     
     /**
-     * Costruttore completo.
+     * Costruttore completo
      * 
-     * @param order L'ordine a cui appartiene questo elemento
-     * @param product Il prodotto
-     * @param quantita La quantità
+     * @param order ordine a cui appartiene questo elemento
+     * @param product prodotto
+     * @param quantita quantità
      * @param prezzoUnitario Il prezzo unitario (potrebbe essere diverso dal prezzo attuale del prodotto)
      */
     public OrderItem(Order order, Product product, int quantita, BigDecimal prezzoUnitario) {
@@ -75,7 +69,6 @@ public class OrderItem {
         this.prezzoUnitario = prezzoUnitario;
     }
     
-    // Getters e Setters
     
     public Long getId() {
         return id;
@@ -121,9 +114,9 @@ public class OrderItem {
     }
     
     /**
-     * Calcola il prezzo totale dell'elemento dell'ordine.
+     * Calcola totale dell'elemento dell'ordine
      * 
-     * @return Il prezzo totale (prezzo unitario * quantità)
+     * @return  prezzo totale (prezzo unitario * quantità)
      */
     public BigDecimal getPrezzoTotale() {
         return prezzoUnitario.multiply(BigDecimal.valueOf(quantita));

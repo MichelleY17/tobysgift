@@ -21,9 +21,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-/**
- * Entità che rappresenta un utente del sistema.
- */
+
 @Entity
 @Table(name = "users")
 public class User {
@@ -69,18 +67,15 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Set<Role> roles = new HashSet<>();
     
-    /**
-     * Costruttore di default.
-     */
+    // costruttore di default
     public User() {
     }
-    
     /**
-     * Costruttore con parametri principali.
+     *parametri per il contruttore principale:
      * 
      * @param email L'email dell'utente
      * @param username Il nome utente
-     * @param password La password (dovrebbe essere criptata prima di essere salvata)
+     * @param password La password 
      * @param nome Il nome dell'utente
      * @param cognome Il cognome dell'utente
      */
@@ -91,12 +86,10 @@ public class User {
         this.nome = nome;
         this.cognome = cognome;
         this.createdAt = LocalDateTime.now();
-        this.roles.add(Role.USER); // Assegna il ruolo USER di default
+        this.roles.add(Role.USER); 
     }
     
-    /**
-     * Metodo invocato prima del persist per impostare la data di creazione.
-     */
+ 
     @PrePersist
     protected void onCreate() {
         if (this.createdAt == null) {
@@ -203,19 +196,19 @@ public class User {
     }
     
     /**
-     * Aggiunge un ruolo all'utente.
+     * per dare all'utente il suo ruolo usando la classe role.java construisco il metodo addRole
      * 
-     * @param role Il ruolo da aggiungere
+     * @param role 
      */
     public void addRole(Role role) {
         this.roles.add(role);
     }
     
     /**
-     * Controlla se l'utente ha un determinato ruolo.
+     *per capire qual è il ruolo di un utente si usa il metodo hasRole
      * 
      * @param role Il ruolo da controllare
-     * @return true se l'utente ha il ruolo, false altrimenti
+     * @return true = utente ha il ruolo   false = se  non ha il ruolo
      */
     public boolean hasRole(Role role) {
         return this.roles.contains(role);

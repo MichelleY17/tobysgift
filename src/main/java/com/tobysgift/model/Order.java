@@ -21,9 +21,6 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 
-/**
- * Entità che rappresenta un ordine.
- */
 @Entity
 @Table(name = "orders")
 public class Order {
@@ -51,16 +48,14 @@ public class Order {
     @Column(name = "indirizzo_consegna")
     private String indirizzoConsegna;
     
-    /**
-     * Costruttore di default.
-     */
     public Order() {
     }
     
     /**
-     * Costruttore con utente.
+     * costruttore semplice  utile quando si vuole creare un ordine avendo solo l'informazione dell'utente
+     *  L'indirizzo di consegna potrebbe essere impostato successivamente o potrebbe essere utilizzato l'indirizzo predefinito dell'utente
      * 
-     * @param user L'utente che ha effettuato l'ordine
+     * @param user utente che ha effettuato l'ordine
      */
     public Order(User user) {
         this.user = user;
@@ -68,10 +63,11 @@ public class Order {
     }
     
     /**
-     * Costruttore completo.
+     *costruttore completo utile quando si hanno già tutte le informazioni necessarie per l'ordine,
+      compreso l'indirizzo di consegna che potrebbe essere diverso dall'indirizzo predefinito dell'utente
      * 
-     * @param user L'utente che ha effettuato l'ordine
-     * @param indirizzoConsegna L'indirizzo di consegna
+     * @param user utente che ha effettuato l'ordine
+     * @param indirizzoConsegna indirizzo di consegna
      */
     public Order(User user, String indirizzoConsegna) {
         this.user = user;
@@ -88,8 +84,7 @@ public class Order {
             this.dataOrdine = LocalDateTime.now();
         }
     }
-    
-    // Getters e Setters
+
     
     public Long getId() {
         return id;
@@ -148,9 +143,9 @@ public class Order {
     }
     
     /**
-     * Aggiunge un elemento all'ordine.
+     * Aggiunge un elemento all'ordine
      * 
-     * @param item L'elemento da aggiungere
+     * @param item elemento da aggiungere
      */
     public void addItem(OrderItem item) {
         items.add(item);
@@ -159,9 +154,9 @@ public class Order {
     }
     
     /**
-     * Rimuove un elemento dall'ordine.
+     * rimuove un elemento dall'ordine
      * 
-     * @param item L'elemento da rimuovere
+     * @param item elemento da rimuovere
      */
     public void removeItem(OrderItem item) {
         items.remove(item);
@@ -184,7 +179,7 @@ public class Order {
     }
     
     /**
-     * Calcola il totale dell'ordine.
+     * calcola il totale ordine
      */
     public void calcolaTotale() {
         BigDecimal nuovoTotale = BigDecimal.ZERO;
@@ -195,11 +190,11 @@ public class Order {
     }
     
     /**
-     * Crea un ordine a partire da un carrello.
+     * crea un ordine a partire da un carrello usando metodo creaOrdineFromCarello()
      * 
-     * @param cart Il carrello da cui creare l'ordine
+     * @param cart carrello da cui creare l'ordine
      * @param indirizzoConsegna L'indirizzo di consegna
-     * @return Il nuovo ordine
+     * @return restituisce nuovo ordine
      */
     public static Order creaOrdineFromCarrello(Cart cart, String indirizzoConsegna) {
         Order order = new Order(cart.getUser(), indirizzoConsegna);
