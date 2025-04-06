@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+xmlns:sec="http://www.thymeleaf.org/extras/spring-security" 
+lang="it">
+<body>
+    <nav th:fragment="navigation" class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" th:href="@{/home}">Toby's Gift</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/home}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/products}">Prodotti</a>
+                    </li>
+                </ul>
+                
+                <!-- <div class="d-flex">
+                    <a th:href="@{/login}" class="btn btn-outline-light me-2">Login</a>
+                    <a th:href="@{/register}" class="btn btn-light">Registrati</a>
+                </div> -->
+                <div class="d-flex">
+                    <!-- Menu utente non autenticato -->
+                    <div sec:authorize="!isAuthenticated()">
+                        <a th:href="@{/login}" class="btn btn-outline-light me-2">Login</a>
+                        <a th:href="@{/register}" class="btn btn-light">Registrati</a>
+                    </div>
+                </div>
+                <div sec:authorize="isAuthenticated()">
+                    <span sec:authentication="name">Username</span>
+                    <form th:action="@{/logout}" method="post" style="display: inline;">
+                        <button class="btn btn-light" type="submit">Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+</body>
+</html>

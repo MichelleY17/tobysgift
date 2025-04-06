@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="it">
+<body>
+    <footer th:fragment="footer" class="bg-dark text-white py-5 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5 class="text-uppercase mb-4">Toby's Gift</h5>
+                    <p>Il miglior negozio online dedicato ai prodotti per cani e servizi professionali per il tuo amico a quattro zampe.</p>
+                    <div class="d-flex mt-4">
+                        <a href="#" class="text-white me-4"><i class="fab fa-facebook-f fa-lg"></i></a>
+                        <a href="#" class="text-white me-4"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-twitter fa-lg"></i></a>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5 class="text-uppercase mb-4">Link utili</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a th:href="@{/home}" class="text-white text-decoration-none">Home</a></li>
+                        <li class="mb-2"><a th:href="@{/products}" class="text-white text-decoration-none">Prodotti</a></li>
+                        <li class="mb-2"><a th:href="@{/professionals}" class="text-white text-decoration-none">Esperti</a></li>
+                        <li class="mb-2"><a th:href="@{/posts}" class="text-white text-decoration-none">Blog</a></li>
+                        <li class="mb-2"><a th:href="@{/about}" class="text-white text-decoration-none">Chi siamo</a></li>
+                        <li><a th:href="@{/contact}" class="text-white text-decoration-none">Contatti</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-md-4">
+                    <h5 class="text-uppercase mb-4">Contattaci</h5>
+                    <p><i class="fas fa-home me-3"></i> Via Roma 123, 00100 Roma, Italia</p>
+                    <p><i class="fas fa-envelope me-3"></i> info@tobysgift.com</p>
+                    <p><i class="fas fa-phone me-3"></i> +39 06 1234567</p>
+                    <p><i class="fas fa-clock me-3"></i> Lun - Ven: 9:00 - 18:00</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center p-3 mt-4" style="background-color: rgba(0, 0, 0, 0.2);">
+            © 2025 Toby's Gift - Tutti i diritti riservati
+            <div class="mt-2">
+                <a href="#" class="text-white text-decoration-none me-3">Privacy Policy</a>
+                <a href="#" class="text-white text-decoration-none me-3">Termini di Servizio</a>
+                <a href="#" class="text-white text-decoration-none">Cookie Policy</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
