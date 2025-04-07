@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="it">
-<body>
-    <header th:fragment="header" class="bg-light py-3 border-bottom">
+<head>
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+</head>
+<body class="header_body">
+    <header th:fragment="header" class=" py-3 border-bottom">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-6">
                     <a th:href="@{/home}" class="text-decoration-none">
-                        <h1 class="h3 mb-0 text-primary">
+                        <h1 class="h1 mb-0 ">
                             <i class="fas fa-paw me-2"></i> Toby's Gift
                         </h1>
                     </a>
-                    <p class="text-muted small mb-0">Il negozio online per il tuo amico a quattro zampe</p>
+                    <p class="text-muted text-uppercase mb-0">It's a doog's world!</p>
                 </div>
                 <div class="col-md-6">
                     <form class="d-flex mt-3 mt-md-0">

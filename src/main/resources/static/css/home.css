@@ -1,0 +1,12 @@
+:root{
+    --backgroun-main: #f4d35e;
+    --color1:#FDFDFF;
+    --color2:#040f16;
+    --color3:#da4167;
+    --color4:#297373;
+}
+
+
+.home_body{
+    background: var(--backgroun-main);
+}

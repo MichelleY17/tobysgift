@@ -2,8 +2,10 @@
 <html xmlns:th="http://www.thymeleaf.org" 
 xmlns:sec="http://www.thymeleaf.org/extras/spring-security" 
 lang="it">
+<head> 
+    <link rel="stylesheet" th:href="@{/css/home.css}"> </head>
 <body>
-    <nav th:fragment="navigation" class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav th:fragment="navigation" class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand" th:href="@{/home}">Toby's Gift</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
@@ -13,10 +15,21 @@ lang="it">
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/home}">Home</a>
+                        <a class="nav-link text-white" th:href="@{/home}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/products}">Prodotti</a>
+                        <a class="nav-link text-white" th:href="@{/products}">Prodotti</a>
+                    </li>
+                    <li class="nav-item dropdown" sec:authorize="hasAuthority('ADMIN')">
+                        <a class="nav-link dropdown-toggle text-white" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown">
+                            Dashboard Admin
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" th:href="@{/admin/dashboard}">Dashboard</a></li>
+                            <li><a class="dropdown-item" th:href="@{/admin/products}">Gestione Prodotti</a></li>
+                            <li><a class="dropdown-item" th:href="@{/admin/professionals}">Gestione Professionisti</a></li>
+                            <li><a class="dropdown-item" th:href="@{/admin/posts}">Gestione Post</a></li>
+                        </ul>
                     </li>
                 </ul>
                 

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prodotti - Toby's Gift</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body class="list_body">
+    <!-- Header e Menu di Navigazione -->
+    <header th:replace="fragments/header :: header"></header>
+    <nav th:replace="fragments/navigation :: navigation"></nav>
+    
+    <div class="container py-5">
+        <!-- Titolo della pagina -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="display-5 mb-3">
+                    <span th:if="${categoryName}" th:text="${categoryName}">Categoria</span>
+                    <span class="list_products_title" th:unless="${categoryName}">Tutti i prodotti</span>
+                </h1>
+                
+                <!-- Breadcrumb per la navigazione -->
+                <nav class="nav_list" aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item nav_home"><a class="link_home_list" th:href="@{/home}">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Prodotti</li>
+                        <li class="breadcrumb-item active" aria-current="page" th:if="${categoryName}" th:text="${categoryName}">Categoria</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Sidebar di filtri e categorie -->
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header  text-white">
+                        <h5 class="mb-0">Filtri</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Ricerca -->
+                        <form th:action="@{/products}" method="get" class="mb-4">
+                            <div class="input-group">
+                                <input type="text" name="search" class="form-control" placeholder="Cerca prodotti..." 
+                                       th:value="${search}">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                            <input type="hidden" name="categoryId" th:if="${categoryId}" th:value="${categoryId}">
+                        </form>
+                        
+                        <!-- Categorie -->
+                        <h6 class="mb-3">Categorie</h6>
+                        <div class="list-group">
+                            <a href="/products" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" 
+                               th:classappend="${categoryId == null} ? 'active' : ''">
+                                Tutte
+                                <span class="badge bg-primary rounded-pill" th:text="${productsCount}">123</span>
+                            </a>
+                            <a th:each="category : ${categories}" 
+                               th:href="@{/products(categoryId=${category.id})}" 
+                               class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                               th:classappend="${categoryId != null && categoryId == category.id} ? 'active' : ''">
+                                <span th:text="${category.nome}">Nome Categoria</span>
+                                <span class="badge bg-primary rounded-pill" th:text="${category.prodotti.size()}">42</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Elenco prodotti -->
+            <div class="col-md-9">
+                <!-- Ordinamento e visualizzazione -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <span th:text="${page.totalElements}">123</span> prodotti trovati
+                    </div>
+                    <div>
+                        <select class="form-select" id="sort">
+                            <option value="nome,asc" th:selected="${sort == 'nome,asc'}">Nome (A-Z)</option>
+                            <option value="nome,desc" th:selected="${sort == 'nome,desc'}">Nome (Z-A)</option>
+                            <option value="prezzo,asc" th:selected="${sort == 'prezzo,asc'}">Prezzo (crescente)</option>
+                            <option value="prezzo,desc" th:selected="${sort == 'prezzo,desc'}">Prezzo (decrescente)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Griglia prodotti -->
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
+                    <!-- Messaggio se non ci sono prodotti -->
+                    <div class="col-12" th:if="${#lists.isEmpty(products)}">
+                        <div class="alert alert-info" role="alert">
+                            <i class="fas fa-info-circle me-2"></i> Nessun prodotto trovato
+                        </div>
+                    </div>
+                    
+                    <!-- Card prodotti -->
+                    <div class="col" th:each="product : ${products}">
+                        <div class="card h-100 product-card shadow-sm">
+                            <div class="position-relative">
+                                <img th:src="${product.immagine != null ? '/images/products/' + product.immagine : '/images/placeholder.jpg'}" 
+                                     class="card-img-top" alt="Immagine prodotto">
+                                     
+                                <!-- Badge per categoria -->
+                                <span class="position-absolute top-0 start-0 badge bg-primary m-2" 
+                                      th:text="${product.categoria.nome}">Categoria</span>
+                                
+                                <!-- Badge per disponibilità -->
+                                <span class="position-absolute top-0 end-0 badge bg-danger m-2" 
+                                      th:if="${product.quantitaDisponibile == 0}">Esaurito</span>
+                                <span class="position-absolute top-0 end-0 badge bg-warning text-dark m-2" 
+                                      th:if="${product.quantitaDisponibile > 0 && product.quantitaDisponibile <= 5}">Ultime unità</span>
+                            </div>
+                            
+                            <div class="card-body">
+                                <h5 class="card-title" th:text="${product.nome}">Nome Prodotto</h5>
+                                <p class="card-text text-truncate" th:text="${product.descrizione}">
+                                    Descrizione del prodotto
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <span class="h5 text-primary mb-0" th:text="${'€' + #numbers.formatDecimal(product.prezzo, 1, 2)}">€19.99</span>
+                                    <a th:href="@{/products/{id}(id=${product.id})}" class="btn btn-outline-primary">
+                                        <i class="fas fa-eye me-1"></i> Dettagli
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-white">
+                                <div class="d-grid">
+                                    <button class="btn btn_accetta add-to-cart-btn" 
+                                            th:data-product-id="${product.id}" 
+                                            th:data-product-name="${product.nome}"
+                                            th:disabled="${product.quantitaDisponibile == 0}">
+                                        <i class="fas fa-cart-plus me-1"></i> 
+                                        <span  th:if="${product.quantitaDisponibile > 0}">Aggiungi al carrello</span>
+                                        <span th:unless="${product.quantitaDisponibile > 0}">Esaurito</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Paginazione -->
+                <nav th:if="${page.totalPages > 1}" aria-label="Paginazione prodotti">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${page.first ? 'disabled' : ''}">
+                            <a class="page-link" th:href="@{/products(page=${page.number - 1}, size=${page.size}, sort=${sort}, search=${search}, categoryId=${categoryId})}" aria-label="Precedente">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+                            th:classappend="${i == page.number ? 'active' : ''}">
+                            <a class="page-link" th:href="@{/products(page=${i}, size=${page.size}, sort=${sort}, search=${search}, categoryId=${categoryId})}" th:text="${i + 1}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${page.last ? 'disabled' : ''}">
+                            <a class="page-link" th:href="@{/products(page=${page.number + 1}, size=${page.size}, sort=${sort}, search=${search}, categoryId=${categoryId})}" aria-label="Successivo">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer th:replace="fragments/footer :: footer"></footer>
+    
+    <!-- Script -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/cart.js}"></script>
+    
+    <script>
+        // Gestione dell'ordinamento
+        document.getElementById('sort').addEventListener('change', function() {
+            const url = new URL(window.location);
+            url.searchParams.set('sort', this.value);
+            window.location.href = url.toString();
+        });
+        
+        // Gestione dei bottoni "Aggiungi al carrello"
+        document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                if (this.disabled) return;
+                
+                const productId = this.getAttribute('data-product-id');
+                const productName = this.getAttribute('data-product-name');
+                
+                addToCart(productId, 1)
+                    .then(response => {
+                        if (response.success) {
+                            showNotification(`${productName} aggiunto al carrello!`, 'success');
+                            updateCartCounter(response.cartItemCount);
+                        } else {
+                            showNotification(response.message, 'warning');
+                        }
+                    })
+                    .catch(error => {
+                        showNotification('Errore durante l\'aggiunta al carrello', 'danger');
+                        console.error('Error:', error);
+                    });
+            });
+        });
+    </script>
+</body>
+</html>

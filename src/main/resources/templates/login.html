@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/main.css}">
 </head>
-<body>
+<body class="login_body">
     <!-- Header e Menu di Navigazione -->
     <header th:replace="fragments/header :: header"></header>
     <nav th:replace="fragments/navigation :: navigation"></nav>
@@ -17,7 +17,7 @@
         <div class="row justify-content-center">
             <div class="col-md-6">
                 <div class="card shadow">
-                    <div class="card-header bg-primary text-white">
+                    <div class="card-header text-white">
                         <h2 class="h4 mb-0">Accedi</h2>
                     </div>
                     <div class="card-body">
@@ -59,7 +59,7 @@
                                 <label class="form-check-label" for="remember-me">Ricordami</label>
                             </div>
                             <div class="d-grid">
-                                <button type="submit" class="btn btn-primary">Accedi</button>
+                                <button type="submit" class="btn btn_accetta">Accedi</button>
                             </div>
                         </form>
                         
@@ -67,7 +67,7 @@
                             <a th:href="@{/forgot-password}" class="text-decoration-none">Password dimenticata?</a>
                             <hr>
                             <p>Non hai ancora un account?</p>
-                            <a th:href="@{/register}" class="btn btn-outline-primary">Registrati</a>
+                            <a th:href="@{/register}" class="btn btn_accetta">Registrati</a>
                         </div>
                     </div>
                 </div>

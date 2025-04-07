@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/main.css}">
 </head>
-<body>
+<body class="register_body">
     <!-- Header e Menu di Navigazione -->
     <header th:replace="fragments/header :: header"></header>
     <nav th:replace="fragments/navigation :: navigation"></nav>
@@ -17,7 +17,7 @@
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="card shadow">
-                    <div class="card-header bg-primary text-white">
+                    <div class="card-header text-white">
                         <h2 class="h4 mb-0">Registrati</h2>
                     </div>
                     <div class="card-body">
@@ -105,7 +105,7 @@
                             </div>
                             
                             <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary">Registrati</button>
+                                <button type="submit" class="btn btn_accetta">Registrati</button>
                                 <a th:href="@{/login}" class="btn btn-outline-secondary">Hai già un account? Accedi</a>
                             </div>
                         </form>
