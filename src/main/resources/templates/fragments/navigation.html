@@ -39,15 +39,15 @@ lang="it">
                 </div> -->
                 <div class="d-flex">
                     <!-- Menu utente non autenticato -->
-                    <div sec:authorize="!isAuthenticated()">
+                    <div class="navigation_login"  sec:authorize="!isAuthenticated()">
                         <a th:href="@{/login}" class="btn btn-outline-light me-2">Login</a>
                         <a th:href="@{/register}" class="btn btn-light">Registrati</a>
                     </div>
                 </div>
-                <div sec:authorize="isAuthenticated()">
+                <div class="navigation_logout" sec:authorize="isAuthenticated()">
                     <span sec:authentication="name">Username</span>
                     <form th:action="@{/logout}" method="post" style="display: inline;">
-                        <button class="btn btn-light" type="submit">Logout</button>
+                        <button class="btn " type="submit">Logout</button>
                     </form>
                 </div>
             </div>
