@@ -15,12 +15,16 @@ public interface UserService {
     User register(User user);
     
     /**
-     * per aggiornare  il profilo di un utente
+     * Aggiorna il profilo dell'utente identificato dall'email
      * 
-     * @param user utente con i dati aggiornati
-     * @return restituisce utente aggiornato
+     * @param email email dell'utente
+     * @param nome nuovo nome
+     * @param cognome nuovo cognome
+     * @param indirizzo nuovo indirizzo
+     * @param telefono nuovo telefono
+     * @return true se l'aggiornamento è avvenuto con successo, false altrimenti
      */
-    User updateProfile(User user);
+    boolean updateUserProfile(String email, String nome, String cognome, String indirizzo, String telefono);
     
     /**
      * per cambiare la password di un utente

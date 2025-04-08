@@ -1,0 +1,137 @@
+src/
+├── main/
+│   ├── java/
+│   │   └── com/
+│   │       └── tobysgift/
+│   │           ├── config/
+│   │           │   ├── SecurityConfig.java
+│   │           │   ├── WebConfig.java
+│   │           │   └── AuditConfig.java
+│   │           ├── controller/
+│   │           │   ├── HomeController.java
+│   │           │   ├── ProductController.java
+│   │           │   ├── CartController.java
+│   │           │   ├── OrderController.java
+│   │           │   ├── ProfessionalController.java
+│   │           │   ├── AppointmentController.java
+│   │           │   ├── PostController.java
+│   │           │   ├── UserController.java
+│   │           │   └── admin/
+│   │           │       ├── AdminDashboardController.java
+│   │           │       ├── AdminProductController.java
+│   │           │       ├── AdminProfessionalController.java
+│   │           │       └── AdminPostController.java
+│   │           ├── model/
+│   │           │   ├── User.java
+│   │           │   ├── AdminUser.java
+│   │           │   ├── Product.java
+│   │           │   ├── Category.java
+│   │           │   ├── Cart.java
+│   │           │   ├── CartItem.java
+│   │           │   ├── Order.java
+│   │           │   ├── OrderItem.java
+│   │           │   ├── OrderStatus.java
+│   │           │   ├── Professional.java
+│   │           │   ├── ProfessionalType.java
+│   │           │   ├── Appointment.java
+│   │           │   ├── AppointmentStatus.java
+│   │           │   ├── Post.java
+│   │           │   └── PostCategory.java
+│   │           ├── repository/
+│   │           │   ├── UserRepository.java
+│   │           │   ├── AdminUserRepository.java
+│   │           │   ├── ProductRepository.java
+│   │           │   ├── CategoryRepository.java
+│   │           │   ├── CartRepository.java
+│   │           │   ├── CartItemRepository.java
+│   │           │   ├── OrderRepository.java
+│   │           │   ├── OrderItemRepository.java
+│   │           │   ├── ProfessionalRepository.java
+│   │           │   ├── AppointmentRepository.java
+│   │           │   └── PostRepository.java
+│   │           ├── service/
+│   │           │   ├── UserService.java
+│   │           │   ├── AdminUserService.java
+│   │           │   ├── ProductService.java
+│   │           │   ├── CartService.java
+│   │           │   ├── OrderService.java
+│   │           │   ├── ProfessionalService.java
+│   │           │   ├── AppointmentService.java
+│   │           │   ├── PostService.java
+│   │           │   └── impl/
+│   │           │       ├── UserServiceImpl.java
+│   │           │       ├── AdminUserServiceImpl.java
+│   │           │       ├── ProductServiceImpl.java
+│   │           │       ├── CartServiceImpl.java
+│   │           │       ├── OrderServiceImpl.java
+│   │           │       ├── ProfessionalServiceImpl.java
+│   │           │       ├── AppointmentServiceImpl.java
+│   │           │       └── PostServiceImpl.java
+│   │           ├── dto/
+│   │           │   ├── UserDTO.java
+│   │           │   ├── ProductDTO.java
+│   │           │   ├── CartDTO.java
+│   │           │   ├── OrderDTO.java
+│   │           │   ├── ProfessionalDTO.java
+│   │           │   ├── AppointmentDTO.java
+│   │           │   └── PostDTO.java
+│   │           ├── exception/
+│   │           │   ├── ResourceNotFoundException.java
+│   │           │   ├── InsufficientQuantityException.java
+│   │           │   └── GlobalExceptionHandler.java
+│   │           └── TobysgiftApplication.java
+│   └── resources/
+│       ├── static/
+│       │   ├── css/
+│       │   │   ├── main.css
+│       │   │   ├── home.css
+│       │   │   ├── cart.css
+│       │   │   ├── admin.css
+│       │   │   └── products.css
+│       │   ├── js/
+│       │   │   ├── main.js
+│       │   │   ├── cart.js
+│       │   │   ├── products.js
+│       │   │   ├── appointments.js
+│       │   │   └── admin.js
+│       │   └── images/
+│       │       ├── logo.png
+│       │       ├── products/
+│       │       ├── professionals/
+│       │       └── posts/
+│       ├── templates/
+│       │   ├── fragments/
+│       │   │   ├── header.html
+│       │   │   ├── footer.html
+│       │   │   ├── navigation.html
+│       │   │   └── pagination.html
+│       │   ├── home.html
+│       │   ├── products.html
+│       │   ├── product-detail.html
+│       │   ├── cart.html
+│       │   ├── checkout.html
+│       │   ├── order-confirmation.html
+│       │   ├── professionals.html
+│       │   ├── appointment-booking.html
+│       │   ├── appointment-confirmation.html
+│       │   ├── login.html
+│       │   ├── register.html
+│       │   ├── profile.html
+│       │   ├── posts.html
+│       │   ├── post-detail.html
+│       │   └── admin/
+│       │       ├── dashboard.html
+│       │       ├── products.html
+│       │       ├── product-form.html
+│       │       ├── professionals.html
+│       │       ├── professional-form.html
+│       │       ├── posts.html
+│       │       └── post-form.html
+│       └── application.properties
+└── test/
+    └── java/
+        └── com/
+            └── tobysgift/
+                ├── controller/
+                ├── service/
+                └── repository/

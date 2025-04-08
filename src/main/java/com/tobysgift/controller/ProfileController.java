@@ -16,8 +16,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.tobysgift.model.User;
 import com.tobysgift.service.UserService;
 
-import jakarta.validation.Valid;
-
 @Controller
 @RequestMapping("/profile")
 public class ProfileController {
@@ -50,24 +48,39 @@ public class ProfileController {
     }
 
     @PostMapping("/edit")
-    public String updateProfile(@Valid @ModelAttribute("user") User user, 
-                                BindingResult bindingResult,
-                                RedirectAttributes redirectAttributes) {
-        
-        if (bindingResult.hasErrors()) {
-            return "profile";
-        }
-        
-        try {
-            userService.updateProfile(user);
-            redirectAttributes.addFlashAttribute("successMessage", "Profilo aggiornato con successo!");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Errore durante l'aggiornamento del profilo: " + e.getMessage());
-        }
-        
-        return "redirect:/profile";
+    public String updateProfile(@ModelAttribute("user") User formUser, 
+                            BindingResult bindingResult,
+                            RedirectAttributes redirectAttributes) {
+    
+    if (bindingResult.hasErrors()) {
+        return "profile";
     }
-
+    
+    try {
+        // Recupera l'utente corrente dal database
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName(); // L'email dell'utente autenticato
+        
+        // Aggiorna il profilo usando solo i campi necessari
+        boolean success = userService.updateUserProfile(
+            email,
+            formUser.getNome(),
+            formUser.getCognome(),
+            formUser.getIndirizzo(),
+            formUser.getTelefono()
+        );
+        
+        if (success) {
+            redirectAttributes.addFlashAttribute("successMessage", "Profilo aggiornato con successo!");
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Impossibile aggiornare il profilo. Utente non trovato.");
+        }
+    } catch (Exception e) {
+        redirectAttributes.addFlashAttribute("errorMessage", "Errore durante l'aggiornamento del profilo: " + e.getMessage());
+    }
+    
+    return "redirect:/profile";
+}
     @GetMapping("/change-password")
     public String changePasswordForm() {
         return "change-password";

@@ -55,19 +55,39 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
     
+    // @Override
+    // @Transactional
+    // public User updateProfile(User user) {
+    //     User existingUser = userRepository.findById(user.getId())
+    //             .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+        
+    //     // Aggiorna solo i campi del profilo, non le credenziali
+    //     existingUser.setNome(user.getNome());
+    //     existingUser.setCognome(user.getCognome());
+    //     existingUser.setIndirizzo(user.getIndirizzo());
+    //     existingUser.setTelefono(user.getTelefono());
+        
+    //     return userRepository.save(existingUser);
+    // }
     @Override
     @Transactional
-    public User updateProfile(User user) {
-        User existingUser = userRepository.findById(user.getId())
-                .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+    public boolean updateUserProfile(String email, String nome, String cognome, String indirizzo, String telefono) {
+        Optional<User> userOpt = userRepository.findByEmail(email);
         
-        // Aggiorna solo i campi del profilo, non le credenziali
-        existingUser.setNome(user.getNome());
-        existingUser.setCognome(user.getCognome());
-        existingUser.setIndirizzo(user.getIndirizzo());
-        existingUser.setTelefono(user.getTelefono());
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            
+            // Aggiorna solo i campi specifici
+            user.setNome(nome);
+            user.setCognome(cognome);
+            user.setIndirizzo(indirizzo);
+            user.setTelefono(telefono);
+            
+            userRepository.save(user);
+            return true;
+        }
         
-        return userRepository.save(existingUser);
+        return false;
     }
     
     @Override

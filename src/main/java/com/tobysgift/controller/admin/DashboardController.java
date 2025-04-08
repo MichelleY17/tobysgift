@@ -2,6 +2,7 @@ package com.tobysgift.controller.admin;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,8 +16,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.tobysgift.model.User;
 import com.tobysgift.service.UserService;
-
-import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/admin")
@@ -47,36 +46,69 @@ public class DashboardController {
     /**
      * Aggiorna il profilo dell'amministratore
      */
+    // @PostMapping("/dashboard/update-profile")
+    // public String updateAdminProfile(@Valid @ModelAttribute("user") User user, 
+    //                                 BindingResult bindingResult,
+    //                                 Authentication authentication,
+    //                                 RedirectAttributes redirectAttributes) {
+        
+    //     // Ottiene l'utente corrente (admin)
+    //     String email = authentication.getName();
+    //     User currentUser = userService.findByEmail(email);
+        
+    //     // Verifica errori di validazione
+    //     if (bindingResult.hasErrors()) {
+    //         return "admin/dashboard"; 
+    //     }
+    //     // Mantiene i valori che non devono essere modificati
+    //     user.setId(currentUser.getId());
+    //     user.setEmail(currentUser.getEmail()); // email è readonly
+    //     user.setUsername(currentUser.getUsername()); 
+    //     user.setPassword(currentUser.getPassword()); 
+    //     user.setRoles(currentUser.getRoles());
+    //     user.setCreatedAt(currentUser.getCreatedAt());
+    //     user.setLastLogin(currentUser.getLastLogin());
+    //     user.setActive(currentUser.isActive());
+        
+    //     // Aggiorna il profilo
+    //     userService.updateUserProfile(user);
+        
+    //     redirectAttributes.addFlashAttribute("successMessage", "Profilo aggiornato con successo");
+    //     return "redirect:/admin/dashboard";
+    // }
     @PostMapping("/dashboard/update-profile")
-    public String updateAdminProfile(@Valid @ModelAttribute("user") User user, 
-                                    BindingResult bindingResult,
-                                    Authentication authentication,
-                                    RedirectAttributes redirectAttributes) {
-        
-        // Ottiene l'utente corrente (admin)
-        String email = authentication.getName();
-        User currentUser = userService.findByEmail(email);
-        
-        // Verifica errori di validazione
-        if (bindingResult.hasErrors()) {
-            return "admin/dashboard"; 
-        }
-        // Mantiene i valori che non devono essere modificati
-        user.setId(currentUser.getId());
-        user.setEmail(currentUser.getEmail()); // email è readonly
-        user.setUsername(currentUser.getUsername()); // username gestito separatamente
-        user.setPassword(currentUser.getPassword()); // password gestita separatamente
-        user.setRoles(currentUser.getRoles());
-        user.setCreatedAt(currentUser.getCreatedAt());
-        user.setLastLogin(currentUser.getLastLogin());
-        user.setActive(currentUser.isActive());
-        
-        // Aggiorna il profilo
-        userService.updateProfile(user);
-        
-        redirectAttributes.addFlashAttribute("successMessage", "Profilo aggiornato con successo");
-        return "redirect:/admin/dashboard";
+public String updateAdminProfile(
+    @ModelAttribute("user") User formUser, 
+    BindingResult bindingResult,
+    RedirectAttributes redirectAttributes
+) {
+    if (bindingResult.hasErrors()) {
+        return "admin/dashboard";
     }
+    
+    try {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        
+        boolean success = userService.updateUserProfile(
+            email,
+            formUser.getNome(),
+            formUser.getCognome(),
+            formUser.getIndirizzo(),
+            formUser.getTelefono()
+        );
+        
+        if (success) {
+            redirectAttributes.addFlashAttribute("successMessage", "Profilo aggiornato con successo!");
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Impossibile aggiornare il profilo.");
+        }
+    } catch (Exception e) {
+        redirectAttributes.addFlashAttribute("errorMessage", "Errore durante l'aggiornamento: " + e.getMessage());
+    }
+    
+    return "redirect:/admin/dashboard";
+}
     
     /**
      * Cambia la password dell'amministratore

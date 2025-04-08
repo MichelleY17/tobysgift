@@ -47,11 +47,12 @@
                                     <i class="fas fa-key me-2"></i>Cambio Password
                                 </button>
                             </li>
-                            <li class="nav-item" role="presentation">
+                            <!-- <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="username-tab" data-bs-toggle="tab" data-bs-target="#username" type="button" role="tab" aria-controls="username" aria-selected="false">
                                     <i class="fas fa-user-edit me-2"></i>Cambio Username
                                 </button>
-                            </li>
+                                
+                            </li> -->
                         </ul>
                         
                         <div class="tab-content p-4" id="profileTabsContent">
@@ -75,7 +76,7 @@
                                                 <span class="input-group-text"><i class="fas fa-user"></i></span>
                                                 <input type="text" class="form-control bg-light" id="username" th:field="*{username}" readonly>
                                             </div>
-                                            <small class="text-muted">Per modificare il nome utente, usa la scheda "Cambio Username".</small>
+                                            <!-- <small class="text-muted">Per modificare il nome utente, usa la scheda "Cambio Username".</small> -->
                                         </div>
                                     </div>
                                     
@@ -186,15 +187,15 @@
                                     </div>
                                 </form>
                             </div>
-                            
-                            <!-- Tab Cambio Username -->
+                           
+                           <!-- Tab Cambio Username -->
                             <div class="tab-pane fade" id="username" role="tabpanel" aria-labelledby="username-tab">
                                 <form th:action="@{/profile/change-username}" method="post" id="usernameForm">
                                     <div class="mb-3">
-                                        <label for="currentUsername" class="form-label">Nome Utente Attuale</label>
+                                        <label class="form-label">Nome Utente Attuale</label>
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                            <input type="text" class="form-control bg-light" id="currentUsername" name="currentUsername" th:value="${user.username}" readonly>
+                                            <input type="text" class="form-control bg-light" th:value="${user.username}" readonly>
                                         </div>
                                     </div>
                                     

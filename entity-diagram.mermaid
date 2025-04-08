@@ -1,0 +1,108 @@
+classDiagram
+    class User {
+        -Long id
+        -String username
+        -String password
+        -String email
+        -String nome
+        -String cognome
+        -String indirizzo
+        -String telefono
+        -boolean active
+        -Role role
+    }
+    
+    class AdminUser {
+        -Long id
+        -String username
+        -String password
+        -String email
+        -boolean active
+    }
+    
+    class Product {
+        -Long id
+        -String nome
+        -String descrizione
+        -double prezzo
+        -int quantitaDisponibile
+        -String immagine
+        -Category categoria
+    }
+    
+    class Category {
+        -Long id
+        -String nome
+        -String descrizione
+    }
+    
+    class Cart {
+        -Long id
+        -User user
+        -List~CartItem~ items
+        -double totale
+    }
+    
+    class CartItem {
+        -Long id
+        -Product product
+        -int quantita
+        -double prezzoUnitario
+    }
+    
+    class Order {
+        -Long id
+        -User user
+        -List~OrderItem~ items
+        -double totale
+        -LocalDateTime dataOrdine
+        -OrderStatus status
+        -String indirizzoConsegna
+    }
+    
+    class OrderItem {
+        -Long id
+        -Product product
+        -int quantita
+        -double prezzoUnitario
+    }
+    
+    class Professional {
+        -Long id
+        -String nome
+        -String cognome
+        -String specializzazione
+        -String descrizione
+        -String immagine
+        -ProfessionalType tipo
+    }
+    
+    class Appointment {
+        -Long id
+        -User user
+        -Professional professional
+        -LocalDateTime dataOra
+        -String note
+        -AppointmentStatus status
+    }
+    
+    class Post {
+        -Long id
+        -String titolo
+        -String contenuto
+        -String immagine
+        -LocalDateTime dataCreazione
+        -AdminUser autore
+        -PostCategory categoria
+    }
+    
+    User "1" -- "1" Cart : possiede
+    Cart "1" -- "*" CartItem : contiene
+    CartItem "*" -- "1" Product : riferisce
+    User "1" -- "*" Order : effettua
+    Order "1" -- "*" OrderItem : contiene
+    OrderItem "*" -- "1" Product : riferisce
+    User "1" -- "*" Appointment : prenota
+    Appointment "*" -- "1" Professional : con
+    AdminUser "1" -- "*" Post : crea
+    Product "*" -- "1" Category : appartiene
