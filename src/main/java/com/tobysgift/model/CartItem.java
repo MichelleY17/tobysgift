@@ -98,7 +98,7 @@ public class CartItem {
     public void setPrezzoUnitario(BigDecimal prezzoUnitario) {
         this.prezzoUnitario = prezzoUnitario;
     }
-    
+
     /**
      * calcola il prezzo totale dell'elemento del carrello 
      * 

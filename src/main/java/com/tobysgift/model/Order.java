@@ -189,29 +189,42 @@ public class Order {
         this.totale = nuovoTotale;
     }
     
-    /**
-     * crea un ordine a partire da un carrello usando metodo creaOrdineFromCarello()
-     * 
-     * @param cart carrello da cui creare l'ordine
-     * @param indirizzoConsegna L'indirizzo di consegna
-     * @return restituisce nuovo ordine
-     */
-    public static Order creaOrdineFromCarrello(Cart cart, String indirizzoConsegna) {
-        Order order = new Order(cart.getUser(), indirizzoConsegna);
-        
-        for (CartItem cartItem : cart.getItems()) {
-            OrderItem orderItem = new OrderItem(
-                order,
-                cartItem.getProduct(),
-                cartItem.getQuantita(),
-                cartItem.getPrezzoUnitario()
-            );
-            order.getItems().add(orderItem);
-        }
-        
-        order.setTotale(cart.getTotale());
-        return order;
+   /**
+ * crea un ordine a partire da un carrello usando metodo creaOrdineFromCarello()
+ * 
+ * @param cart carrello da cui creare l'ordine
+ * @param indirizzoConsegna L'indirizzo di consegna
+ * @return restituisce nuovo ordine
+ */
+public static Order creaOrdineFromCarrello(Cart cart, String indirizzoConsegna) {
+    if (cart == null) {
+        throw new IllegalArgumentException("Il carrello non può essere null");
     }
+    
+    if (cart.getUser() == null) {
+        throw new IllegalArgumentException("Il carrello deve avere un utente valido");
+    }
+    
+    // Crea l'ordine con l'utente e l'indirizzo
+    Order order = new Order(cart.getUser(), indirizzoConsegna);
+    order.setStatus(OrderStatus.CREATO);
+    
+    // Aggiungi gli elementi dal carrello all'ordine
+    for (CartItem cartItem : cart.getItems()) {
+        OrderItem orderItem = new OrderItem(
+            order,
+            cartItem.getProduct(),
+            cartItem.getQuantita(),
+            cartItem.getPrezzoUnitario()
+        );
+        order.getItems().add(orderItem);
+    }
+    
+    // Imposta il totale dell'ordine
+    order.setTotale(cart.getTotale());
+    
+    return order;
+}
     
     @Override
     public String toString() {

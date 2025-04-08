@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Ordini - Toby's Gift Admin</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+    <!-- Include header admin -->
+    <header th:replace="fragments/header :: header"></header>
+    <nav th:replace="fragments/navigation :: navigation"></nav>
+    
+    
+    <div class="container-fluid mt-4 mb-5">
+        <h2 class="mb-4">Gestione Ordini</h2>
+        
+        <!-- Alert Messages -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        
+        <!-- Orders Table -->
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Lista Ordini</h5>
+                    <div>
+                        <!-- Filtro per stati -->
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                Filtra per stato
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" th:href="@{/admin/orders}">Tutti gli stati</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li th:each="status : ${orderStatuses}">
+                                    <a class="dropdown-item" th:href="@{/admin/orders(status=${status})}">
+                                        <span class="badge rounded-pill" 
+                                              th:classappend="${
+                                                  status.name() == 'CREATO' ? 'bg-secondary' : 
+                                                  status.name() == 'PAGAMENTO_IN_ATTESA' ? 'bg-warning text-dark' :
+                                                  status.name() == 'PAGAMENTO_CONFERMATO' ? 'bg-info text-dark' :
+                                                  status.name() == 'IN_PREPARAZIONE' ? 'bg-primary' :
+                                                  status.name() == 'SPEDITO' ? 'bg-info' :
+                                                  status.name() == 'CONSEGNATO' ? 'bg-success' :
+                                                  'bg-danger'
+                                              }"
+                                              th:text="${status.descrizione}"></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Sorting Options -->
+                <div class="mb-3">
+                    <label for="sort" class="form-label">Ordina per:</label>
+                    <select id="sort" class="form-select form-select-sm" onchange="updateSorting(this.value)">
+                        <option value="dataOrdine,desc" th:selected="${sort == 'dataOrdine,desc'}">Data (più recenti prima)</option>
+                        <option value="dataOrdine,asc" th:selected="${sort == 'dataOrdine,asc'}">Data (più vecchi prima)</option>
+                        <option value="totale,desc" th:selected="${sort == 'totale,desc'}">Importo (decrescente)</option>
+                        <option value="totale,asc" th:selected="${sort == 'totale,asc'}">Importo (crescente)</option>
+                    </select>
+                </div>
+                
+                <!-- No Orders Message -->
+                <div th:if="${ordersPage.empty}" class="alert alert-info">
+                    <p>Non ci sono ordini nel sistema.</p>
+                </div>
+                
+                <!-- Orders Table -->
+                <div class="table-responsive" th:if="${!ordersPage.empty}">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Data</th>
+                                <th>Cliente</th>
+                                <th>Stato</th>
+                                <th>Totale</th>
+                                <th>Articoli</th>
+                                <th>Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="order : ${ordersPage.content}">
+                                <td th:text="${order.id}"></td>
+                                <td th:text="${#temporals.format(order.dataOrdine, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td>
+                                    <span th:text="${order.user.nome + ' ' + order.user.cognome}"></span>
+                                    <br>
+                                    <small th:text="${order.user.email}"></small>
+                                </td>
+                                <td>
+                                    <span class="badge rounded-pill" 
+                                          th:classappend="${
+                                              order.status.name() == 'CREATO' ? 'bg-secondary' : 
+                                              order.status.name() == 'PAGAMENTO_IN_ATTESA' ? 'bg-warning text-dark' :
+                                              order.status.name() == 'PAGAMENTO_CONFERMATO' ? 'bg-info text-dark' :
+                                              order.status.name() == 'IN_PREPARAZIONE' ? 'bg-primary' :
+                                              order.status.name() == 'SPEDITO' ? 'bg-info' :
+                                              order.status.name() == 'CONSEGNATO' ? 'bg-success' :
+                                              'bg-danger'
+                                          }"
+                                          th:text="${order.status.descrizione}"></span>
+                                </td>
+                                <td th:text="${#numbers.formatCurrency(order.totale)}"></td>
+                                <td th:text="${order.items.size()}"></td>
+                                <td>
+                                    <a th:href="@{/admin/orders/{id}(id=${order.id})}" class="btn btn-sm btn-info">
+                                        <i class="bi bi-eye"></i> Dettagli
+                                    </a>
+                                    <div class="dropdown d-inline-block">
+                                        <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            Cambia stato
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li th:each="status : ${orderStatuses}">
+                                                <form th:action="@{/admin/orders/{id}/update-status(id=${order.id})}" method="post">
+                                                    <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+                                                    <input type="hidden" name="status" th:value="${status}">
+                                                    <button type="submit" class="dropdown-item" 
+                                                            th:classappend="${order.status == status ? 'active' : ''}"
+                                                            th:disabled="${order.status == status}">
+                                                        <span class="badge rounded-pill me-1" 
+                                                              th:classappend="${
+                                                                status.name() == 'CREATO' ? 'bg-secondary' : 
+                                                                status.name() == 'PAGAMENTO_IN_ATTESA' ? 'bg-warning text-dark' :
+                                                                status.name() == 'PAGAMENTO_CONFERMATO' ? 'bg-info text-dark' :
+                                                                status.name() == 'IN_PREPARAZIONE' ? 'bg-primary' :
+                                                                status.name() == 'SPEDITO' ? 'bg-info' :
+                                                                status.name() == 'CONSEGNATO' ? 'bg-success' :
+                                                                'bg-danger'
+                                                              }"
+                                                              th:text="${status.descrizione}"></span>
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <div th:if="${ordersPage.totalPages > 1}" class="d-flex justify-content-center mt-3">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination">
+                            <li class="page-item" th:classappend="${ordersPage.number == 0 ? 'disabled' : ''}">
+                                <a class="page-link" th:href="@{/admin/orders(page=${ordersPage.number - 1}, sort=${sort})}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(0, ordersPage.totalPages - 1)}"
+                                th:classappend="${ordersPage.number == i ? 'active' : ''}">
+                                <a class="page-link" th:href="@{/admin/orders(page=${i}, sort=${sort})}" th:text="${i + 1}"></a>
+                            </li>
+                            <li class="page-item" th:classappend="${ordersPage.number == ordersPage.totalPages - 1 ? 'disabled' : ''}">
+                                <a class="page-link" th:href="@{/admin/orders(page=${ordersPage.number + 1}, sort=${sort})}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer th:replace="fragments/footer :: footer"></footer>
+    
+    <!-- Script -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/admin.js}"></script>
+    <script>
+        function updateSorting(sortValue) {
+            window.location.href = `/admin/orders?sort=${sortValue}`;
+        }
+    </script>
+</body>
+</html>

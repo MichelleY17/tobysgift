@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Il tuo carrello - Toby's Gift</title>
+    
+    <!-- CSRF token per le richieste AJAX -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/cart.css}">
+</head>
+<body class="list_body">
+    <!-- Header e Navigation -->
+    <header th:replace="fragments/header :: header"></header>
+    <nav th:replace="fragments/navigation :: navigation"></nav>
+    
+    <main class="container">
+        <section class="cart-section">
+            <h1 class="page-title">Il tuo carrello</h1>
+            
+            <!-- Notifiche -->
+            <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+            <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+            
+            <!-- Contenuto del carrello -->
+            <div class="cart-content">
+                <!-- Se il carrello è vuoto -->
+                <div th:if="${cart.items.isEmpty()}" class="empty-cart">
+                    <div class="empty-cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <h2>Il tuo carrello è vuoto</h2>
+                    <p>Aggiungi alcuni prodotti al carrello per procedere con l'acquisto.</p>
+                    <a href="/products" class="btn btn-primary">Continua lo shopping</a>
+                </div>
+                
+                <!-- Se ci sono prodotti nel carrello -->
+                <div th:unless="${cart.items.isEmpty()}" class="cart-details">
+                    <div class="cart-items-container">
+                        <!-- Intestazioni -->
+                        <div class="cart-headers">
+                            <div class="cart-header-product">Prodotto</div>
+                            <div class="cart-header-price">Prezzo</div>
+                            <div class="cart-header-quantity">Quantità</div>
+                            <div class="cart-header-total">Totale</div>
+                            <div class="cart-header-actions"></div>
+                        </div>
+                        
+                        <!-- Elementi del carrello -->
+                        <div class="cart-items">
+                            <div th:each="item : ${cart.items}" th:id="'cart-item-' + ${item.id}" class="cart-item">
+                                <!-- Prodotto -->
+                                <div class="cart-item-product">
+                                    <div class="cart-item-image">
+                                        <img th:src="${item.product.immagine != null ? '/images/products/' + item.product.immagine : '/images/placeholder.jpg'}" 
+                                             class="card-img-top" 
+                                             th:alt="${item.product.nome}">
+                                    </div>
+                                    <div class="cart-item-details">
+                                        <h3 class="cart-item-name" th:text="${item.product.nome}"></h3>
+                                        
+                                        <!-- Personalizzazione
+                                        <div th:if="${item.product.personalizzabile}" class="cart-item-personalization">
+                                            <span class="personalization-badge">
+                                                <i class="fas fa-pen"></i> Personalizzabile
+                                            </span>
+                                            
+                                            <div th:if="${item.personalizzazione != null}" class="personalization-text">
+                                                <span th:text="${item.personalizzazione}"></span>
+                                            </div> -->
+                                            
+                                            <!-- Link per personalizzare il prodotto -->
+                                            <!-- <a th:if="${item.personalizzazione == null}" 
+                                               th:href="@{'/products/' + ${item.product.id} + '/personalize'}" 
+                                               class="personalize-link">
+                                                Personalizza
+                                            </a>
+                                        </div> -->
+                                        
+                                        <!-- Categoria -->
+                                        <div class="cart-item-category" th:if="${item.product.categoria != null}">
+                                            <span th:text="${item.product.categoria.nome}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Prezzo -->
+                                <div class="cart-item-price">
+                                    <span th:text="${#numbers.formatCurrency(item.product.prezzo)}"></span>
+                                </div>
+                                
+                                <!-- Quantità -->
+                                <div class="cart-item-quantity">
+                                    <button class="quantity-btn quantity-decrease" th:data-item-id="${item.id}">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <span th:id="'item-quantity-' + ${item.id}" th:text="${item.quantita}"></span>
+                                    <button class="quantity-btn quantity-increase" th:data-item-id="${item.id}">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                                
+                                <!-- Totale -->
+                                <div class="cart-item-total">
+                                    <span th:id="'item-total-' + ${item.id}" 
+                                          th:text="${#numbers.formatCurrency(item.product.prezzo * item.quantita)}"></span>
+                                </div>
+                                
+                                <!-- Azioni -->
+                                <div class="cart-item-actions">
+                                    <button class="remove-item-btn" th:data-item-id="${item.id}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Riepilogo -->
+                    <div class="cart-summary">
+                        <h3>Riepilogo ordine</h3>
+                        
+                        <div class="cart-summary-item cart-subtotal">
+                            <span>Subtotale</span>
+                            <span id="cart-total" th:text="${#numbers.formatCurrency(cart.totale)}"></span>
+                        </div>
+                        
+                        <div class="cart-summary-item cart-shipping">
+                            <span>Spedizione</span>
+                            <span th:text="${cart.totale > 50 ? 'Gratuita' : #numbers.formatCurrency(4.99)}"></span>
+                        </div>
+                        
+                        <!-- Note sulla spedizione -->
+                        <div class="shipping-info">
+                            <p th:if="${cart.totale > 50}" class="free-shipping-message">
+                                <i class="fas fa-check-circle"></i> Spedizione gratuita applicata
+                            </p>
+                            <p th:unless="${cart.totale > 50}" class="shipping-threshold-message">
+                                <i class="fas fa-info-circle"></i> Aggiungi 
+                                <span th:text="${#numbers.formatCurrency(50 - cart.totale)}"></span> 
+                                per ottenere la spedizione gratuita
+                            </p>
+                        </div>
+                        
+                        <div class="cart-summary-item cart-total-amount">
+                            <span>Totale</span>
+                            <span th:text="${#numbers.formatCurrency(cart.totale > 50 ? cart.totale : cart.totale + 4.99)}"></span>
+                        </div>
+                        
+                        <!-- Azioni carrello -->
+                        <div class="cart-actions">
+                            <a href="/products" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Continua lo shopping
+                            </a>
+                            
+                            <form th:action="@{/cart/clear}" method="post">
+                                <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-trash"></i> Svuota carrello
+                                </button>
+                            </form>
+                            
+                            <form th:action="@{/cart/checkout}" method="post">
+                                <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                                <button type="submit" class="btn btn-primary checkout-btn">
+                                    <i class="fas fa-credit-card"></i> Procedi al checkout
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Prodotti consigliati -->
+        <section th:if="${recommendedProducts != null && !recommendedProducts.isEmpty()}" class="recommended-products">
+            <h2>Potrebbero interessarti anche</h2>
+            
+            <div class="products-grid">
+                <div th:each="product : ${recommendedProducts}" class="product-card">
+                    <div class="product-image">
+                        <a th:href="@{'/products/' + ${product.id}}">
+                            <img th:src="${product.immagine != null ? '/images/products/' + product.immagine : '/images/placeholder.jpg'}" 
+                                 class="card-img-top" 
+                                 th:alt="${product.nome}">
+                        </a>
+                        
+                        <!-- Badge per disponibilità -->
+                        <span class="position-absolute top-0 end-0 badge bg-danger m-2" 
+                              th:if="${product.quantitaDisponibile == 0}">Esaurito</span>
+                        <span class="position-absolute top-0 end-0 badge bg-warning text-dark m-2" 
+                              th:if="${product.quantitaDisponibile > 0 && product.quantitaDisponibile <= 5}">Ultime unità</span>
+                    </div>
+                    
+                    <div class="product-info">
+                        <h3 class="product-name">
+                            <a th:href="@{'/products/' + ${product.id}}" th:text="${product.nome}"></a>
+                        </h3>
+<!--                         
+                        Badge personalizzabile
+                        <div th:if="${product.personalizzabile}" class="product-badge">
+                            <i class="fas fa-pen"></i> Personalizzabile
+                        </div> -->
+                        
+                        <div class="product-price">
+                            <span class="h5 text-primary mb-0" th:text="${'€' + #numbers.formatDecimal(product.prezzo, 1, 2)}">€19.99</span>
+                        </div>
+                        
+                        <div class="product-actions">
+                            <div class="quantity-selector">
+                                <input type="number" class="quantity-input" value="1" min="1" max="99">
+                            </div>
+                            
+                            <button class="btn btn-primary add-to-cart-btn" th:data-product-id="${product.id}">
+                                <i class="fas fa-cart-plus"></i> Aggiungi
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer -->
+    <footer th:replace="fragments/footer :: footer"></footer>
+    
+    <!-- Script -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/cart.js}"></script>
+</body>
+</html>

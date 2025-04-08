@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dettaglio Ordine - Toby's Gift Admin</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+    <!-- Include header admin -->
+    <header th:replace="fragments/header :: header"></header>
+    <nav th:replace="fragments/navigation :: navigation"></nav>
+    
+    <div class="container-fluid mt-4 mb-5">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/admin}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/admin/orders}">Ordini</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Ordine #<span th:text="${order.id}"></span></li>
+            </ol>
+        </nav>
+        
+        <!-- Alert Messages -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0">Ordine #<span th:text="${order.id}"></span></h3>
+                        <div>
+                            <span class="badge rounded-pill" 
+                                  th:classappend="${
+                                      order.status.name() == 'CREATO' ? 'bg-secondary' : 
+                                      order.status.name() == 'PAGAMENTO_IN_ATTESA' ? 'bg-warning text-dark' :
+                                      order.status.name() == 'PAGAMENTO_CONFERMATO' ? 'bg-info text-dark' :
+                                      order.status.name() == 'IN_PREPARAZIONE' ? 'bg-primary' :
+                                      order.status.name() == 'SPEDITO' ? 'bg-info' :
+                                      order.status.name() == 'CONSEGNATO' ? 'bg-success' :
+                                      'bg-danger'
+                                  }"
+                                  th:text="${order.status.descrizione}"></span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h5>Dettagli Ordine</h5>
+                                <ul class="list-unstyled">
+                                    <li><strong>Data:</strong> <span th:text="${#temporals.format(order.dataOrdine, 'dd/MM/yyyy HH:mm')}"></span></li>
+                                    <li><strong>Stato:</strong> <span th:text="${order.status.descrizione}"></span></li>
+                                    <li><strong>Totale:</strong> <span th:text="${#numbers.formatCurrency(order.totale)}"></span></li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Indirizzo di Consegna</h5>
+                                <address th:text="${order.indirizzoConsegna}"></address>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h5>Dati Cliente</h5>
+                                <ul class="list-unstyled">
+                                    <li><strong>Nome:</strong> <span th:text="${order.user.nome + ' ' + order.user.cognome}"></span></li>
+                                    <li><strong>Username:</strong> <span th:text="${order.user.username}"></span></li>
+                                    <li><strong>Email:</strong> <span th:text="${order.user.email}"></span></li>
+                                    <li><strong>Telefono:</strong> <span th:text="${order.user.telefono != null ? order.user.telefono : 'Non specificato'}"></span></li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <h5>Articoli Ordinati</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Prodotto</th>
+                                        <th>Prezzo Unitario</th>
+                                        <th>Quantità</th>
+                                        <th>Totale</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="item : ${order.items}">
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img th:if="${item.product != null && item.product.immagine != null}" 
+                                                     th:src="@{'/images/products/' + ${item.product.immagine}}" 
+                                                     alt="Product Image" class="me-2" style="width: 50px; height: 50px; object-fit: cover;">
+                                                <span th:text="${item.product != null ? item.product.nome : item.nomeProdotto}"></span>
+                                            </div>
+                                        </td>
+                                        <td th:text="${#numbers.formatCurrency(item.prezzoUnitario)}"></td>
+                                        <td th:text="${item.quantita}"></td>
+                                        <td th:text="${#numbers.formatCurrency(item.prezzoTotale)}"></td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="3" class="text-end fw-bold">Totale:</td>
+                                        <td th:text="${#numbers.formatCurrency(order.totale)}" class="fw-bold"></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Gestione Ordine</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Form per aggiornare lo stato dell'ordine -->
+                        <form th:action="@{/admin/orders/{id}/update-status(id=${order.id})}" method="post" class="mb-4">
+                            <div class="mb-3">
+                                <label for="status" class="form-label">Stato Ordine:</label>
+                                <select class="form-select" id="status" name="status">
+                                    <option th:each="status : ${orderStatuses}" 
+                                            th:value="${status}" 
+                                            th:text="${status.descrizione}"
+                                            th:selected="${order.status == status}"></option>
+                                </select>
+                            </div>
+                            <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+                            <button type="submit" class="btn btn-primary">Aggiorna Stato</button>
+                        </form>
+                        
+                        <hr>
+                        
+                        <a th:href="@{/admin/orders}" class="btn btn-outline-primary d-block">
+                            <i class="bi bi-arrow-left"></i> Torna alla lista ordini
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer th:replace="fragments/footer :: footer"></footer>
+    
+    <!-- Script -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/admin.js}"></script>
+</body>
+</html>

@@ -20,6 +20,9 @@ lang="it">
                     <li class="nav-item">
                         <a class="nav-link text-white" th:href="@{/products}">Prodotti</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" th:href="@{/products}">Ordini</a>
+                    </li>
                     <li class="nav-item dropdown" sec:authorize="hasAuthority('ADMIN')">
                         <a class="nav-link dropdown-toggle text-white" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown">
                             Dashboard Admin
@@ -32,11 +35,13 @@ lang="it">
                         </ul>
                     </li>
                 </ul>
-                
-                <!-- <div class="d-flex">
-                    <a th:href="@{/login}" class="btn btn-outline-light me-2">Login</a>
-                    <a th:href="@{/register}" class="btn btn-light">Registrati</a>
-                </div> -->
+                <div class="cart-icon-container">
+                    <a th:href="@{/cart}" class="cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-counter" th:text="${session.cartItemCount != null ? session.cartItemCount : 0}"
+                            th:style="${session.cartItemCount == null || session.cartItemCount == 0 ? 'display: none;' : ''}">0</span>
+                    </a>
+                </div>
                 <div class="d-flex">
                     <!-- Menu utente non autenticato -->
                     <div class="navigation_login"  sec:authorize="!isAuthenticated()">

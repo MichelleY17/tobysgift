@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I Miei Ordini - Toby's Gift</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+    <!-- Include header -->
+    <div th:replace="fragments/header :: header"></div>
+    <nav th:replace="fragments/navigation :: navigation"></nav>
+    
+    <div class="container mt-4 mb-5">
+        <h2 class="text-center mb-4">I Miei Ordini</h2>
+        
+        <!-- Alert Messages -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        
+        <!-- No Orders Message -->
+        <div th:if="${ordersPage.empty}" class="alert alert-info">
+            <p>Non hai ancora effettuato nessun ordine.</p>
+            <a href="/products" class="btn btn-primary">Inizia a fare acquisti</a>
+        </div>
+        
+        <!-- Orders List -->
+        <div th:if="${!ordersPage.empty}" class="list-group mb-4">
+            <div th:each="order : ${ordersPage.content}" class="list-group-item list-group-item-action">
+                <div class="d-flex w-100 justify-content-between align-items-center">
+                    <h5 class="mb-1">
+                        <a th:href="@{/orders/{id}(id=${order.id})}" class="text-decoration-none">
+                            Ordine #<span th:text="${order.id}"></span>
+                        </a>
+                    </h5>
+                    <span class="badge rounded-pill" 
+                          th:classappend="${
+                              order.status.name() == 'CREATO' ? 'bg-secondary' : 
+                              order.status.name() == 'PAGAMENTO_IN_ATTESA' ? 'bg-warning text-dark' :
+                              order.status.name() == 'PAGAMENTO_CONFERMATO' ? 'bg-info text-dark' :
+                              order.status.name() == 'IN_PREPARAZIONE' ? 'bg-primary' :
+                              order.status.name() == 'SPEDITO' ? 'bg-info' :
+                              order.status.name() == 'CONSEGNATO' ? 'bg-success' :
+                              'bg-danger'
+                          }"
+                          th:text="${order.status.descrizione}"></span>
+                </div>
+                <p class="mb-1">
+                    <strong>Data:</strong> <span th:text="${#temporals.format(order.dataOrdine, 'dd/MM/yyyy HH:mm')}"></span>
+                </p>
+                <p class="mb-1">
+                    <strong>Totale:</strong> <span th:text="${#numbers.formatCurrency(order.totale)}"></span>
+                </p>
+                <small>
+                    <strong>Articoli:</strong> <span th:text="${order.items.size()}"></span>
+                </small>
+            </div>
+        </div>
+        
+        <!-- Pagination -->
+        <div th:if="${ordersPage.totalPages > 1}" class="d-flex justify-content-center">
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <li class="page-item" th:classappend="${ordersPage.number == 0 ? 'disabled' : ''}">
+                        <a class="page-link" th:href="@{/orders(page=${ordersPage.number - 1})}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item" th:each="i : ${#numbers.sequence(0, ordersPage.totalPages - 1)}"
+                        th:classappend="${ordersPage.number == i ? 'active' : ''}">
+                        <a class="page-link" th:href="@{/orders(page=${i})}" th:text="${i + 1}"></a>
+                    </li>
+                    <li class="page-item" th:classappend="${ordersPage.number == ordersPage.totalPages - 1 ? 'disabled' : ''}">
+                        <a class="page-link" th:href="@{/orders(page=${ordersPage.number + 1})}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="/products" class="btn btn-primary">Continua gli acquisti</a>
+        </div>
+    </div>
+    
+    <!-- Include footer -->
+    <div th:replace="fragments/footer :: footer"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>
