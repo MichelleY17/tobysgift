@@ -6,7 +6,7 @@
     --color4:#297373;
     --color5: #3A3335;
 }
-.login_body, .register_body, .products_body, .list_body{
+.login_body, .register_body, .products_body, .list_body, .body_detail_product, .admin_body, .list_professionals_body, .professionals_body,.orders_admin_body, .dashboard_body, .detail_professional_admin{
     background: var(--backgroun-main);
 }
 body{

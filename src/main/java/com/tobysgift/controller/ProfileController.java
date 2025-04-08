@@ -55,7 +55,7 @@ public class ProfileController {
                                 RedirectAttributes redirectAttributes) {
         
         if (bindingResult.hasErrors()) {
-            return "profile-edit";
+            return "profile";
         }
         
         try {

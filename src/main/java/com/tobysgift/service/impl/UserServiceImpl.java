@@ -88,19 +88,44 @@ public class UserServiceImpl implements UserService {
         return true;
     }
     
+    // @Override
+    // @Transactional
+    // public boolean changeUsername(String email, String newUsername) {
+    //     // per veridficare  se il nuovo username è già in uso
+    //     if (userRepository.existsByUsername(newUsername)) {
+    //         return false;
+    //     }
+        
+    //     User user = userRepository.findByEmail(email)
+    //             .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+        
+    //     user.setUsername(newUsername);
+    //     userRepository.save(user);
+        
+    //     return true;
+    // }
     @Override
     @Transactional
     public boolean changeUsername(String email, String newUsername) {
-        // per veridficare  se il nuovo username è già in uso
+        // Log per debug
+        System.out.println("Service: Cambio username per email " + email + " a " + newUsername);
+        
+        // Verifica se il nuovo username è già in uso
         if (userRepository.existsByUsername(newUsername)) {
+            System.out.println("Service: Username già in uso: " + newUsername);
             return false;
         }
         
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Utente non trovato"));
         
+        // Memorizza il vecchio username per log
+        String oldUsername = user.getUsername();
+        
         user.setUsername(newUsername);
         userRepository.save(user);
+        
+        System.out.println("Service: Username cambiato da " + oldUsername + " a " + newUsername);
         
         return true;
     }

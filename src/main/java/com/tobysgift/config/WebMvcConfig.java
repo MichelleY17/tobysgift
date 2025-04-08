@@ -22,21 +22,38 @@ public class WebMvcConfig implements WebMvcConfigurer {
     }
     
     @Value("${app.upload.dir:uploads/products}")
-    private String uploadDir;
+    private String productUploadDir;
+
+    @Value("${app.upload.dir.professionals:uploads/professionals}")
+    private String professionalUploadDir;
     /**
      * per configurare i gestori di risorse statiche
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        Path uploadPath = Paths.get(uploadDir);
-        String absoluteUploadPath = uploadPath.toFile().getAbsolutePath();
-        // per configurare i percorsi per le risorse statiche
-        registry.addResourceHandler("/images/products/**")
-                .addResourceLocations("file:" +absoluteUploadPath+"/");
-                System.out.println("Configurate risorse statiche per immagini prodotti: " + absoluteUploadPath);        
+         // Percorso per immagini dei prodotti
+         Path productUploadPath = Paths.get(productUploadDir);
+         String absoluteProductUploadPath = productUploadPath.toFile().getAbsolutePath();
+         
+         // Percorso per immagini dei professionisti
+         Path professionalUploadPath = Paths.get(professionalUploadDir);
+         String absoluteProfessionalUploadPath = professionalUploadPath.toFile().getAbsolutePath();
+         
+         // Risorse per prodotti
+         registry.addResourceHandler("/images/products/**")
+                 .addResourceLocations("file:" + absoluteProductUploadPath + "/");
+         
+         // Risorse per professionisti
+         registry.addResourceHandler("/images/professionals/**")
+                 .addResourceLocations("file:" + absoluteProfessionalUploadPath + "/");   
+
         registry.addResourceHandler("/css/**")
                 .addResourceLocations("classpath:/static/css/");
         registry.addResourceHandler("/js/**")
                 .addResourceLocations("classpath:/static/js/");
+
+        System.out.println("Configurate risorse statiche per immagini: " 
+                + absoluteProductUploadPath + ", " 
+                + absoluteProfessionalUploadPath);         
     }
 }

@@ -11,8 +11,8 @@
 </head>
 <body class="home_body">
     <!-- Header e Menu di Navigazione -->
-    <header th:replace="fragments/header :: header"></header>
-    <nav th:replace="fragments/navigation :: navigation"></nav>
+    <header th:replace="~{fragments/header :: header}"></header>
+    <nav th:replace="~{fragments/navigation :: navigation}"></nav>
     
     <!-- Sezione Hero -->
     <section class="hero-section py-5">
@@ -42,9 +42,13 @@
                     <ul class="list-group">
                         <li class="list-group-item">Registrazione</li>
                         <li class="list-group-item">Login con email</li>
-                        <li class="list-group-item">Pagina profilo personale (presto disponibile)</li>
-                        <li class="list-group-item">Catalogo prodotti (presto disponibile)</li>
-                        <li class="list-group-item">Carrello acquisti (presto disponibile)</li>
+                        <li class="list-group-item">Pagina profilo personale</li>
+                        <li class="list-group-item">Catalogo prodotti </li>
+                        <li class="list-group-item">Carrello acquisti</li>
+                        <li class="list-group-item">Ordini</li>
+                        <li class="list-group-item">Lista Professionali</li>
+                        <li class="list-group-item">Prenotazione Appuntamenti  (presto disponibile)</li>
+                        <li class="list-group-item">Post (presto disponibile)</li>
                     </ul>
                 </div>
             </div>

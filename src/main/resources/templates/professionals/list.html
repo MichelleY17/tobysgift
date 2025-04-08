@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="it">
+<head>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>Professionisti - Toby's Gift</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body class="list_professionals_body">
+    <!-- Header e Menu di Navigazione -->
+    <header th:replace="fragments/header :: header"></header>
+    <nav th:replace="fragments/navigation :: navigation"></nav>
+    
+    <div class="container py-5">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="display-5 mb-3">
+                    <span th:if="${typeName}" th:text="${typeName}">Tipo Professionista</span>
+                    <span class="list_professionals_title" th:unless="${typeName}">Tutti i Professionisti</span>
+                </h1>
+                
+                <!-- Breadcrumb per la navigazione -->
+                <nav class="nav_list" aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item nav_home"><a class="link_home_list" th:href="@{/home}">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Professionisti</li>
+                        <li class="breadcrumb-item active" aria-current="page" th:if="${typeName}" th:text="${typeName}">Tipo Professionista</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Sidebar di filtri e categorie -->
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header text-white">
+                        <h5 class="mb-0">Filtri</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Ricerca -->
+                        <form th:action="@{/professionals}" method="get" class="mb-4">
+                            <div class="input-group">
+                                <input type="text" name="search" class="form-control" placeholder="Cerca professionisti..." 
+                                       th:value="${search}">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                            <input type="hidden" name="typeId" th:if="${typeId}" th:value="${typeId}">
+                        </form>
+                        
+                        <!-- Tipi di Professionisti -->
+                        <h6 class="mb-3">Tipi di Professionisti</h6>
+                        <div class="list-group">
+                            <a href="/professionals" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" 
+                               th:classappend="${typeId == null} ? 'active' : ''">
+                                Tutti
+                                <span class="badge bg-primary rounded-pill" th:text="${professionalsCount}">123</span>
+                            </a>
+                            <a th:each="type : ${professionalTypes}" 
+                               th:href="@{/professionals(typeId=${type.id})}" 
+                               class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                               th:classappend="${typeId != null && typeId == type.id} ? 'active' : ''">
+                                <span th:text="${type.nome}">Nome Tipo</span>
+                                <span class="badge bg-primary rounded-pill" th:text="${type.professionals.size()}">42</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Elenco Professionisti -->
+            <div class="col-md-9">
+                <!-- Ordinamento e visualizzazione -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <span th:text="${page.totalElements}">123</span> professionisti trovati
+                    </div>
+                    <div>
+                        <select class="form-select" id="sort">
+                            <option value="nome,asc" th:selected="${sort == 'nome,asc'}">Nome (A-Z)</option>
+                            <option value="nome,desc" th:selected="${sort == 'nome,desc'}">Nome (Z-A)</option>
+                            <option value="specializzazione,asc" th:selected="${sort == 'specializzazione,asc'}">Specializzazione (A-Z)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Griglia Professionisti -->
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
+                    <!-- Messaggio se non ci sono professionisti -->
+                    <div class="col-12" th:if="${#lists.isEmpty(professionals)}">
+                        <div class="alert alert-info" role="alert">
+                            <i class="fas fa-info-circle me-2"></i> Nessun professionista trovato
+                        </div>
+                    </div>
+                    
+                    <!-- Card Professionisti -->
+                    <div class="col" th:each="professional : ${professionals}">
+                        <div class="card h-100 professional-card shadow-sm">
+                            <div class="position-relative">
+                                <img th:src="${professional.immagine != null ? '/images/professionals/' + professional.immagine : '/images/placeholder-professional.jpg'}" 
+                                     class="card-img-top" alt="Immagine professionista">
+                                     
+                                <!-- Badge per tipo -->
+                                <span class="position-absolute top-0 start-0 badge bg-primary m-2" 
+                                      th:text="${professional.tipo.nome}">Tipo Professionista</span>
+                            </div>
+                            
+                            <div class="card-body">
+                                <h5 class="card-title" th:text="${professional.nomeCompleto}">Nome Professionista</h5>
+                                <p class="card-text text-truncate" th:text="${professional.specializzazione}">
+                                    Specializzazione
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <span class="h6 text-primary mb-0" th:text="${professional.email}">email@example.com</span>
+                                    <a th:href="@{/professionals/{id}(id=${professional.id})}" class="btn btn-outline-primary">
+                                        <i class="fas fa-eye me-1"></i> Dettagli
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Paginazione -->
+                <nav th:if="${page.totalPages > 1}" aria-label="Paginazione professionisti">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${page.first} ? 'disabled' : ''">
+                            <a class="page-link" th:href="@{/professionals(page=${page.number - 1}, size=${page.size}, sort=${sort}, search=${search}, typeId=${typeId})}" aria-label="Precedente">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+                            th:classappend="${i == page.number} ? 'active' : ''">
+                            <a class="page-link" th:href="@{/professionals(page=${i}, size=${page.size}, sort=${sort}, search=${search}, typeId=${typeId})}" th:text="${i + 1}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${page.last} ? 'disabled' : ''">
+                            <a class="page-link" th:href="@{/professionals(page=${page.number + 1}, size=${page.size}, sort=${sort}, search=${search}, typeId=${typeId})}" aria-label="Successivo">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer th:replace="fragments/footer :: footer"></footer>
+    
+    <!-- Script -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('sort').addEventListener('change', function() {
+            const url = new URL(window.location);
+            url.searchParams.set('sort', this.value);
+            window.location.href = url.toString();
+        });
+    </script>
+</body>
+</html>

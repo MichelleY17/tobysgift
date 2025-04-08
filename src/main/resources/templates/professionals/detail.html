@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="it">
+<head>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title th:text="${professional.nomeCompleto} + ' - Toby\'s Gift'">Dettaglio Professionista - Toby's Gift</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body class="body_detail_professional">
+    <!-- Header e Menu di Navigazione -->
+    <header th:replace="fragments/header :: header"></header>
+    <nav th:replace="fragments/navigation :: navigation"></nav>
+    
+    <div class="container py-5">
+        <!-- Breadcrumb per la navigazione -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/home}">Home</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/professionals}">Professionisti</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/professionals(typeId=${professional.tipo.id})}" th:text="${professional.tipo.nome}">Tipo</a></li>
+                <li class="breadcrumb-item active" aria-current="page" th:text="${professional.nomeCompleto}">Nome Professionista</li>
+            </ol>
+        </nav>
+        
+        <div class="row">
+            <!-- Immagine e Info Professionista -->
+            <div class="col-md-5 mb-4">
+                <div class="card border-0 shadow-sm">
+                    <img th:src="${professional.immagine != null ? '/images/professionals/' + professional.immagine : '/images/placeholder-professional.jpg'}" 
+                         class="card-img-top" alt="Immagine professionista">
+                    
+                    <!-- Badge tipo -->
+                    <div class="position-absolute top-0 start-0 m-3">
+                        <span class="badge bg-primary" th:text="${professional.tipo.nome}">Tipo Professionista</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dettagli Professionista -->
+            <div class="col-md-7">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h1 class="card-title h2 mb-3" th:text="${professional.nomeCompleto}">Nome Professionista</h1>
+                        
+                        <div class="mb-4">
+                            <h5 class="text-primary" th:text="${professional.specializzazione}">Specializzazione</h5>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <p class="card-text" th:text="${professional.descrizione}">
+                                Descrizione dettagliata del professionista.
+                            </p>
+                        </div>
+                        
+                        <!-- Informazioni di Contatto -->
+                        <div class="card mt-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">Informazioni di Contatto</h5>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <i class="fas fa-envelope me-2 text-primary"></i>
+                                    <strong>Email:</strong> <span th:text="${professional.email}">email@example.com</span>
+                                </li>
+                                <li class="list-group-item" th:if="${professional.telefono}">
+                                    <i class="fas fa-phone me-2 text-primary"></i>
+                                    <strong>Telefono:</strong> <span th:text="${professional.telefono}">Numero non disponibile</span>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Pulsante Prenota Appuntamento -->
+                        <div class="mt-4">
+                            <sec:authorize access="isAuthenticated()">
+                                <button id="bookAppointmentBtn" class="btn btn-primary btn-lg w-100" 
+                                        data-bs-toggle="modal" data-bs-target="#appointmentModal">
+                                    <i class="far fa-calendar-plus me-2"></i>Prenota Appuntamento
+                                </button>
+                            </sec:authorize>
+                            <sec:authorize access="!isAuthenticated()">
+                                <div class="alert alert-warning" role="alert">
+                                    <i class="fas fa-lock me-2"></i>Effettua il login per prenotare un appuntamento
+                                </div>
+                            </sec:authorize>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Calendario Appuntamenti -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Disponibilità Appuntamenti</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="calendar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Prossimi Appuntamenti -->
+        <div class="row mt-5" th:if="${not #lists.isEmpty(upcomingAppointments)}">
+            <div class="col-12">
+                <h3 class="mb-4">Prossimi Appuntamenti</h3>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Ora</th>
+                                <th>Stato</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="appointment : ${upcomingAppointments}">
+                                <td th:text="${#temporals.format(appointment.dataOra, 'dd/MM/yyyy')}">01/01/2024</td>
+                                <td th:text="${#temporals.format(appointment.dataOra, 'HH:mm')}">10:00</td>
+                                <td>
+                                    <span class="badge" 
+                                          th:classappend="${
+                                              appointment.status == T(com.tobysgift.model.AppointmentStatus).RICHIESTO ? 'bg-warning' :
+                                              appointment.status == T(com.tobysgift.model.AppointmentStatus).CONFERMATO ? 'bg-success' :
+                                              appointment.status == T(com.tobysgift.model.AppointmentStatus).ANNULLATO ? 'bg-danger' : 'bg-secondary'
+                                          }"
+                                          th:text="${appointment.status.descrizione}">
+                                        Stato
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Prenotazione Appuntamento -->
+    <div class="modal fade" id="appointmentModal" tabindex="-1" aria-labelledby="appointmentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="appointmentModalLabel">
+                        Prenota Appuntamento con <span th:text="${professional.nomeCompleto}">Nome Professionista</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="bookAppointmentForm">
+                        <input type="hidden" name="professionalId" th:value="${professional.id}">
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="appointmentDate" class="form-label">Data Appuntamento</label>
+                                <input type="date" class="form-control" id="appointmentDate" name="appointmentDate" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="appointmentTime" class="form-label">Ora Appuntamento</label>
+                                <input type="time" class="form-control" id="appointmentTime" name="appointmentTime" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="appointmentNotes" class="form-label">Note (Opzionale)</label>
+                            <textarea class="form-control" id="appointmentNotes" name="notes" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="button" class="btn btn-primary" id="confirmAppointmentBtn">Conferma Appuntamento</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer th:replace="fragments/footer :: footer"></footer>
+    
+    <!-- Script -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/locale/it.js"></script>
+    
+    <script th:inline="javascript">
+        // Preparazione dati per il calendario
+        const professionalId = /*[[${professional.id}]]*/ null;
+        const professionalType = /*[[${professional.tipo.nome}]]*/ '';
+        const blockedWeekends = professionalType === 'Veterinario';
+        
+        // Configurazione calendario
+        $(document).ready(function() {
+            $('#calendar').fullCalendar({
+                locale: 'it',
+                height: 'auto',
+                header: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'month,agendaWeek,agendaDay'
+                },
+                defaultView: 'month',
+                selectable: true,
+                selectHelper: true,
+                select: function(start, end) {
+                    // Verifica se la data è selezionabile
+                    if (blockedWeekends && (start.day() === 0 || start.day() === 6)) {
+                        alert('Spiacenti, non è possibile prenotare nel fine settimana.');
+                        return;
+                    }
+                    
+                    // Popola il modal con la data selezionata
+                    $('#appointmentDate').val(start.format('YYYY-MM-DD'));
+                    $('#appointmentModal').modal('show');
+                },
+                events: function(start, end, timezone, callback) {
+                    // Carica gli appuntamenti esistenti per questo professionista
+                    $.ajax({
+                        url: `/professionals/${professionalId}/appointments`,
+                        method: 'GET',
+                        success: function(data) {
+                            const events = data.map(appointment => ({
+                                title: appointment.status,
+                                start: appointment.dataOra,
+                                color: appointment.status === 'CONFERMATO' ? 'green' : 
+                                        appointment.status === 'RICHIESTO' ? 'orange' : 'red'
+                            }));
+                            callback(events);
+                        },
+                        error: function() {
+                            alert('Impossibile caricare gli appuntamenti');
+                        }
+                    });
+                }
+            });
+            
+            // Gestione conferma appuntamento
+            $('#confirmAppointmentBtn').on('click', function() {
+                const formData = new FormData(document.getElementById('bookAppointmentForm'));
+                
+                // Ottieni il token CSRF
+                const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+                const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+                
+                fetch('/appointments/book', {
+                    method: 'POST',
+                    headers: {
+                        [csrfHeader]: csrfToken
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Chiudi il modal e mostra messaggio di successo
+                        $('#appointmentModal').modal('hide');
+                        alert('Appuntamento prenotato con successo!');
+                        // Ricarica il calendario
+                        $('#calendar').fullCalendar('refetchEvents');
+                    } else {
+                        // Mostra eventuali errori
+                        alert(data.message || 'Errore durante la prenotazione');
+                    }
+                })
+                .catch(error => {
+                    console.error('Errore:', error);
+                    alert('Si è verificato un errore durante la prenotazione');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

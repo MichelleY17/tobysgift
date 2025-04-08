@@ -62,7 +62,7 @@ public class OrderController {
         
         User user = userService.findByEmail(email);
         if (user == null) {
-            logger.error("Utente non trovato per username: {}", email);
+            logger.error("Utente non trovato per email: {}", email);
             return "redirect:/login";
         }
         
@@ -100,7 +100,7 @@ public class OrderController {
             
             User user = userService.findByEmail(email);
             if (user == null) {
-                logger.error("Utente non trovato per username: {}", email);
+                logger.error("Utente non trovato per email: {}", email);
                 redirectAttributes.addFlashAttribute("errorMessage", "Utente non trovato");
                 return "redirect:/orders/checkout";
             }
@@ -145,19 +145,19 @@ public class OrderController {
                            Principal principal,
                            RedirectAttributes redirectAttributes) {
         try {
-            String username = principal.getName();
-            logger.info("Visualizzazione ordine {} richiesta dall'utente: {}", id, username);
+            String email = principal.getName();
+            logger.info("Visualizzazione ordine {} richiesta dall'utente: {}", id, email);
             
-            User user = userService.findByUsername(username);
+            User user = userService.findByEmail(email);
             if (user == null) {
-                logger.error("Utente non trovato per username: {}", username);
+                logger.error("Utente non trovato per email: {}", email);
                 redirectAttributes.addFlashAttribute("errorMessage", "Utente non trovato");
                 return "redirect:/orders";
             }
             
             // Controlla che l'utente sia autorizzato a visualizzare l'ordine
             if (!orderService.isUserAuthorized(id, user)) {
-                logger.warn("Utente {} non autorizzato a visualizzare l'ordine {}", username, id);
+                logger.warn("Utente {} non autorizzato a visualizzare l'ordine {}", email, id);
                 redirectAttributes.addFlashAttribute("errorMessage", 
                         "Non sei autorizzato a visualizzare questo ordine");
                 return "redirect:/orders";
@@ -192,12 +192,12 @@ public class OrderController {
                             @RequestParam(defaultValue = "10") int size,
                             RedirectAttributes redirectAttributes) {
         try {
-            String username = principal.getName();
-            logger.info("Visualizzazione lista ordini richiesta dall'utente: {}", username);
+            String email = principal.getName();
+            logger.info("Visualizzazione lista ordini richiesta dall'utente: {}", email);
             
-            User user = userService.findByUsername(username);
+            User user = userService.findByEmail(email);
             if (user == null) {
-                logger.error("Utente non trovato per username: {}", username);
+                logger.error("Utente non trovato per email: {}", email);
                 redirectAttributes.addFlashAttribute("errorMessage", "Utente non trovato");
                 return "redirect:/";
             }

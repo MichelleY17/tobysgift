@@ -3,60 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin - Toby's Gift</title>
+    <title>Il Mio Profilo - Toby's Gift</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/main.css}">
 </head>
-<body class="dashboard_body">
+<body>
     <!-- Header e Menu di Navigazione -->
     <header th:replace="~{fragments/header :: header}"></header>
     <nav th:replace="~{fragments/navigation :: navigation}"></nav>
     
-    <div class="container-fluid py-4">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
-                <div class="position-sticky pt-3">
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link active" th:href="@{/admin/dashboard}">
-                                <i class="fas fa-tachometer-alt me-2"></i> Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/admin/products}">
-                                <i class="fas fa-box me-2"></i> Gestione Prodotti
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/admin/professionals}">
-                                <i class="fas fa-user-md me-2"></i> Gestione Professionisti
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/admin/posts}">
-                                <i class="fas fa-newspaper me-2"></i> Gestione Post
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/admin/orders}">
-                                <i class="fas fa-shopping-cart me-2"></i> Gestione Ordini
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/admin/appointments}">
-                                <i class="fas fa-calendar-alt me-2"></i> Gestione Appuntamenti
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            
-            <!-- Contenuto principale -->
-            <div class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">Il Mio Profilo Admin</h1>
+                    <h1 class="h2">Il Mio Profilo</h1>
                 </div>
                 
                 <!-- Messaggi di feedback -->
@@ -72,12 +33,7 @@
                     <span th:text="${passwordError}"></span>
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-                <div th:if="${usernameError}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <span th:text="${usernameError}"></span>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
                 
-                <!-- Tabs per la gestione del profilo -->
                 <div class="card shadow-sm">
                     <div class="card-body">
                         <ul class="nav nav-tabs" id="profileTabs" role="tablist">
@@ -101,7 +57,7 @@
                         <div class="tab-content p-4" id="profileTabsContent">
                             <!-- Tab Informazioni Personali -->
                             <div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="info-tab">
-                                <form th:action="@{/admin/dashboard/update-profile}" th:object="${user}" method="post">
+                                <form th:action="@{/profile/edit}" th:object="${user}" method="post">
                                     <!-- Campo nascosto per l'ID -->
                                     <input type="hidden" th:field="*{id}">
                                     
@@ -175,14 +131,6 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="mb-3">
-                                        <label class="form-label">Ruoli</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
-                                            <input type="text" class="form-control bg-light" th:value="${user.roles}" readonly>
-                                        </div>
-                                    </div>
-                                    
                                     <div class="d-flex justify-content-end mt-4">
                                         <button type="submit" class="btn btn-primary">
                                             <i class="fas fa-save me-2"></i>Salva Modifiche
@@ -193,7 +141,7 @@
                             
                             <!-- Tab Cambio Password -->
                             <div class="tab-pane fade" id="password" role="tabpanel" aria-labelledby="password-tab">
-                                <form th:action="@{/admin/dashboard/change-password}" method="post" id="passwordForm">
+                                <form th:action="@{/profile/change-password}" method="post" id="passwordForm">
                                     <div class="mb-3">
                                         <label for="oldPassword" class="form-label">Password Attuale <span class="text-danger">*</span></label>
                                         <div class="input-group">
@@ -241,10 +189,7 @@
                             
                             <!-- Tab Cambio Username -->
                             <div class="tab-pane fade" id="username" role="tabpanel" aria-labelledby="username-tab">
-                                <form th:action="@{/admin/dashboard/change-username}" method="post" id="usernameForm">
-                                    <!-- Aggiungere il token CSRF è importante -->
-                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                                    
+                                <form th:action="@{/profile/change-username}" method="post" id="usernameForm">
                                     <div class="mb-3">
                                         <label for="currentUsername" class="form-label">Nome Utente Attuale</label>
                                         <div class="input-group">
@@ -283,7 +228,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script th:src="@{/js/main.js}"></script>
-    <!-- <script th:src="@{/js/admin.js}"></script> -->
     
     <script>
         // Gestione mostra/nascondi password
@@ -338,19 +282,7 @@
             if (document.querySelector('[th\\:if="${passwordError}"]')) {
                 document.getElementById('password-tab').click();
             }
-            
-            // Controllo errori username
-            if (document.querySelector('[th\\:if="${usernameError}"]')) {
-                document.getElementById('username-tab').click();
-            }
         });
     </script>
 </body>
 </html>
-
-
-
-
-
-
-

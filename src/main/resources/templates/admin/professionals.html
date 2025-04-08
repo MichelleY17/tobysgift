@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Professionisti - Admin - Toby's Gift</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <!-- CSRF Token per le richieste AJAX -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+<body class="professionals_body">
+    <!-- Header e Menu di Navigazione -->
+    <header th:replace="fragments/header :: header"></header>
+    <nav th:replace="fragments/navigation :: navigation"></nav>
+    
+    <div class="container-fluid py-4">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/admin/dashboard}">
+                                <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/admin/products}">
+                                <i class="fas fa-box me-2"></i> Gestione Prodotti
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" th:href="@{/admin/professionals}">
+                                <i class="fas fa-user-md me-2"></i> Gestione Professionisti
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/admin/posts}">
+                                <i class="fas fa-newspaper me-2"></i> Gestione Post
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/admin/orders}">
+                                <i class="fas fa-shopping-cart me-2"></i> Gestione Ordini
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/admin/appointments}">
+                                <i class="fas fa-calendar-alt me-2"></i> Gestione Appuntamenti
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Contenuto principale -->
+            <div class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Gestione Professionisti</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <a th:href="@{/admin/professionals/new}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-plus"></i> Nuovo Professionista
+                        </a>
+                        <a th:href="@{/admin/professionals/types}" class="btn btn-sm btn-outline-secondary ms-2">
+                            <i class="fas fa-tags"></i> Gestione Tipi
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Messaggi di successo o errore -->
+                <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <span th:text="${successMessage}">Operazione completata con successo!</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                
+                <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <span th:text="${errorMessage}">Si è verificato un errore!</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                
+                <!-- Barra di ricerca e filtri -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <form th:action="@{/admin/professionals}" method="get" class="d-flex">
+                            <input type="text" name="search" class="form-control me-2" placeholder="Cerca professionisti..." 
+                                   th:value="${search}">
+                            <button type="submit" class="btn btn-outline-primary">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </form>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex justify-content-md-end">
+                            <select class="form-select me-2" style="max-width: 200px;" id="typeFilter" name="type">
+                                <option value="">Tutti i Tipi</option>
+                                <option th:each="professionalType : ${professionalTypes}" 
+                                        th:value="${professionalType.nome}" 
+                                        th:text="${professionalType.nome}"
+                                        th:selected="${type != null && type == professionalType.nome}">
+                                    Tipo Professionista
+                                </option>
+                            </select>
+                            <select class="form-select" style="max-width: 200px;" id="sortFilter" name="sort">
+                                <option value="nome,asc" th:selected="${sort == null || sort == 'nome,asc'}">Nome (A-Z)</option>
+                                <option value="nome,desc" th:selected="${sort != null && sort == 'nome,desc'}">Nome (Z-A)</option>
+                                <option value="specializzazione,asc" th:selected="${sort != null && sort == 'specializzazione,asc'}">Specializzazione (A-Z)</option>
+                                <option value="specializzazione,desc" th:selected="${sort != null && sort == 'specializzazione,desc'}">Specializzazione (Z-A)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tabella professionisti -->
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Immagine</th>
+                                <th>Nome</th>
+                                <th>Tipo</th>
+                                <th>Specializzazione</th>
+                                <th>Email</th>
+                                <th>Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${professionals.empty}">
+                                <td colspan="7" class="text-center py-4">Nessun professionista trovato</td>
+                            </tr>
+                            <tr th:each="professional : ${professionals}">
+                                <td th:text="${professional.id}">1</td>
+                                <td>
+                                    <img th:src="${professional.immagine != null ? '/images/professionals/' + professional.immagine : '/images/placeholder-professional.jpg'}" 
+                                         alt="Professional image" class="admin-professional-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
+                                </td>
+                                <td th:text="${professional.nomeCompleto}">Nome Professionista</td>
+                                <td>
+                                    <span class="badge bg-primary" th:text="${professional.tipo.nome}">Tipo Professionista</span>
+                                </td>
+                                <td th:text="${professional.specializzazione}">Specializzazione</td>
+                                <td th:text="${professional.email}">email@example.com</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a th:href="@{/admin/professionals/{id}/edit(id=${professional.id})}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                                th:data-professional-id="${professional.id}"
+                                                th:data-professional-name="${professional.nomeCompleto}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Paginazione -->
+                <nav th:if="${professionals.totalPages > 0}" aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${professionals.first ? 'disabled' : ''}">
+                            <a class="page-link" th:href="@{/admin/professionals(page=${professionals.number - 1}, size=${professionals.size}, search=${search}, type=${type}, sort=${sort})}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, professionals.totalPages - 1)}"
+                            th:classappend="${i == professionals.number ? 'active' : ''}">
+                            <a class="page-link" th:href="@{/admin/professionals(page=${i}, size=${professionals.size}, search=${search}, type=${type}, sort=${sort})}" th:text="${i + 1}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${professionals.last ? 'disabled' : ''}">
+                            <a class="page-link" th:href="@{/admin/professionals(page=${professionals.number + 1}, size=${professionals.size}, search=${search}, type=${type}, sort=${sort})}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal per la conferma dell'eliminazione -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Conferma eliminazione</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Sei sicuro di voler eliminare il professionista <span id="professionalNameToDelete" class="fw-bold"></span>?
+                    <p class="text-danger mt-2">Questa azione non può essere annullata!</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                    <form id="deleteForm" th:action="@{/admin/professionals/delete}" method="post">
+                        <input type="hidden" name="professionalId" id="professionalIdToDelete">
+                        <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+                        <button type="submit" class="btn btn-danger">Elimina</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer th:replace="fragments/footer :: footer"></footer>
+    
+    <!-- Script -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <script>
+        // Gestione filtro per tipo
+        document.getElementById('typeFilter').addEventListener('change', function() {
+            applyFilters();
+        });
+        
+        // Gestione ordinamento
+        document.getElementById('sortFilter').addEventListener('change', function() {
+            applyFilters();
+        });
+        
+        // Funzione per applicare i filtri
+        function applyFilters() {
+            const typeVal = document.getElementById('typeFilter').value;
+            const sortVal = document.getElementById('sortFilter').value;
+            const searchParams = new URLSearchParams(window.location.search);
+            
+            const searchVal = searchParams.get('search') || '';
+            
+            window.location.href = `/admin/professionals?search=${encodeURIComponent(searchVal)}&type=${encodeURIComponent(typeVal)}&sort=${encodeURIComponent(sortVal)}`;
+        }
+        
+        // Dati per la modal di eliminazione
+        const deleteModal = document.getElementById('deleteModal');
+        if (deleteModal) {
+            deleteModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                const professionalId = button.getAttribute('data-professional-id');
+                const professionalName = button.getAttribute('data-professional-name');
+                
+                const professionalNameElement = document.getElementById('professionalNameToDelete');
+                const professionalIdElement = document.getElementById('professionalIdToDelete');
+                
+                professionalNameElement.textContent = professionalName;
+                professionalIdElement.value = professionalId;
+            });
+        }
+    </script>
+</body>
+</html>

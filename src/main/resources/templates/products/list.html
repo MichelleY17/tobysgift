@@ -1,13 +1,40 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>Prodotti - Toby's Gift</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/main.css}">
 </head>
+<style>
+    .product-notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        border-radius: 4px;
+        color: white;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 1060;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        max-width: 350px;
+    }
+    
+    .product-notification-success {
+        background-color: #28a745;
+    }
+    
+    .product-notification-error {
+        background-color: #dc3545;
+    }
+    
+    .product-notification.show {
+        opacity: 1;
+    }
+    </style>
 <body class="list_body">
     <!-- Header e Menu di Navigazione -->
     <header th:replace="fragments/header :: header"></header>
@@ -131,6 +158,7 @@
                             </div>
                             <div class="card-footer bg-white">
                                 <div class="d-grid">
+                                    <div class="col">
                                     <button class="btn btn_accetta add-to-cart-btn" 
                                             th:data-product-id="${product.id}" 
                                             th:data-product-name="${product.nome}"
@@ -178,36 +206,119 @@
     <script th:src="@{/js/cart.js}"></script>
     
     <script>
-        // Gestione dell'ordinamento
-        document.getElementById('sort').addEventListener('change', function() {
-            const url = new URL(window.location);
-            url.searchParams.set('sort', this.value);
-            window.location.href = url.toString();
-        });
+         document.getElementById('sort').addEventListener('change', function() {
+        const url = new URL(window.location);
+        url.searchParams.set('sort', this.value);
+        window.location.href = url.toString();
+    });
+    
+    // Gestione dei bottoni "Aggiungi al carrello"
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("Initializing add to cart buttons in product list");
         
-        // Gestione dei bottoni "Aggiungi al carrello"
         document.querySelectorAll('.add-to-cart-btn').forEach(button => {
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                
                 if (this.disabled) return;
                 
                 const productId = this.getAttribute('data-product-id');
                 const productName = this.getAttribute('data-product-name');
                 
-                addToCart(productId, 1)
-                    .then(response => {
-                        if (response.success) {
-                            showNotification(`${productName} aggiunto al carrello!`, 'success');
-                            updateCartCounter(response.cartItemCount);
-                        } else {
-                            showNotification(response.message, 'warning');
+                console.log(`Add to cart clicked for product: ${productId} - ${productName}`);
+                
+                // Ottieni il token CSRF dalla pagina
+                const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+                const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+                
+                // Disabilita temporaneamente il pulsante
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Aggiunta...';
+                
+                // Prepara i dati per la richiesta
+                const formData = new FormData();
+                formData.append("quantity", 1);
+                
+                // Effettua la richiesta POST all'API
+                fetch(`/cart/add/${productId}`, {
+                    method: "POST",
+                    headers: {
+                        [csrfHeader]: csrfToken
+                    },
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Riattiva il pulsante
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fas fa-cart-plus me-1"></i> Aggiungi al carrello';
+                    
+                    if (data.success) {
+                        // Aggiorna il contatore del carrello nell'header
+                        const cartCounter = document.querySelector(".cart-counter");
+                        if (cartCounter) {
+                            cartCounter.textContent = data.cartItemCount;
+                            if (data.cartItemCount === 0) {
+                                cartCounter.style.display = "none";
+                            } else {
+                                cartCounter.style.display = "flex";
+                            }
                         }
-                    })
-                    .catch(error => {
-                        showNotification('Errore durante l\'aggiunta al carrello', 'danger');
-                        console.error('Error:', error);
-                    });
+                        
+                        // Mostra una notifica di successo
+                        showListPageNotification(`${productName} aggiunto al carrello!`, 'success');
+                    } else {
+                        showListPageNotification(data.message || "Errore durante l'aggiunta al carrello", 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fas fa-cart-plus me-1"></i> Aggiungi al carrello';
+                    showListPageNotification('Errore durante l\'aggiunta al carrello', 'error');
+                });
             });
         });
+    });
+    
+    // Funzione per mostrare notifiche nella pagina prodotti
+    function showListPageNotification(message, type) {
+        // Rimuovi eventuali notifiche esistenti
+        const existingNotifications = document.querySelectorAll('.product-notification');
+        existingNotifications.forEach(notification => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        });
+        
+        // Crea l'elemento di notifica
+        const notification = document.createElement('div');
+        notification.className = `product-notification product-notification-${type}`;
+        notification.textContent = message;
+        
+        // Aggiungi la notifica al DOM
+        document.body.appendChild(notification);
+        
+        // Mostra la notifica
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 10);
+        
+        // Rimuovi la notifica dopo 3 secondi
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }, 3000);
+    }
     </script>
 </body>
 </html>
