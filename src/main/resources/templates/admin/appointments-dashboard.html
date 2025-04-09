@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Appuntamenti - Toby's Gift Admin</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+<body class="appointments_dashboard_body">
+    <!-- Include header admin -->
+    <header th:replace="fragments/header :: header"></header>
+    <nav th:replace="fragments/navigation :: navigation"></nav>
+    
+    <div class="container-fluid py-4">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/admin/dashboard}">
+                                <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/admin/products}">
+                                <i class="fas fa-box me-2"></i> Gestione Prodotti
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/admin/professionals}">
+                                <i class="fas fa-user-md me-2"></i> Gestione Professionisti
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/admin/posts}">
+                                <i class="fas fa-newspaper me-2"></i> Gestione Post
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/admin/orders}">
+                                <i class="fas fa-shopping-cart me-2"></i> Gestione Ordini
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" th:href="@{/admin/appointments}">
+                                <i class="fas fa-calendar-alt me-2"></i> Gestione Appuntamenti
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h2 class="h2">Dashboard Appuntamenti</h2>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <a href="/admin/appointments" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-list me-1"></i> Lista Appuntamenti
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Alert Messages -->
+                <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <span th:text="${successMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                
+                <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <span th:text="${errorMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                
+                <!-- Statistiche generali -->
+                <div class="row mb-4">
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Appuntamenti Totali</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${totalCount}">50</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            In Attesa</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${requestedCount}">10</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-clock fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-success shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                            Confermati</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${confirmedCount}">20</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-info shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                            Completati</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${completedCount}">15</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-clipboard-check fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Grafico Appuntamenti -->
+                <div class="row mb-4">
+                    <div class="col-xl-8 col-lg-7">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                <h6 class="m-0 font-weight-bold text-primary">Distribuzione Appuntamenti</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-pie pt-4 pb-2">
+                                    <canvas id="appointmentsChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-xl-4 col-lg-5">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Professionisti Più Prenotati</h6>
+                            </div>
+                            <div class="card-body">
+                                <div th:if="${#lists.isEmpty(topProfessionals)}" class="text-center p-3">
+                                    <p class="text-muted">Nessun dato disponibile</p>
+                                </div>
+                                <div th:unless="${#lists.isEmpty(topProfessionals)}">
+                                    <ul class="list-group">
+                                        <li th:each="prof, iStat : ${topProfessionals}" class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <span th:text="${iStat.count + '. ' + prof.nomeCompleto}">1. Nome Professionista</span>
+                                                <br>
+                                                <small class="text-muted" th:text="${prof.tipo.nome}">Tipo</small>
+                                            </div>
+                                            <span class="badge bg-primary rounded-pill" th:text="${prof.appointments.size()}">25</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Appuntamenti Oggi -->
+                <div class="row mb-4">
+                    <div class="col-lg-6">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Appuntamenti di Oggi</h6>
+                            </div>
+                            <div class="card-body">
+                                <div th:if="${#lists.isEmpty(todayAppointments)}" class="text-center p-3">
+                                    <p class="text-muted">Nessun appuntamento programmato per oggi</p>
+                                </div>
+                                <div class="table-responsive" th:unless="${#lists.isEmpty(todayAppointments)}">
+                                    <table class="table table-striped table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Ora</th>
+                                                <th>Professionista</th>
+                                                <th>Cliente</th>
+                                                <th>Stato</th>
+                                                <th>Azioni</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="app : ${todayAppointments}">
+                                                <td th:text="${#temporals.format(app.dataOra, 'HH:mm')}">10:00</td>
+                                                <td th:text="${app.professional.nomeCompleto}">Nome Professionista</td>
+                                                <td th:text="${app.user.username}">Username</td>
+                                                <td>
+                                                    <span class="badge rounded-pill" 
+                                                          th:classappend="${
+                                                              app.status.name() == 'RICHIESTO' ? 'bg-warning' :
+                                                              app.status.name() == 'CONFERMATO' ? 'bg-success' :
+                                                              app.status.name() == 'COMPLETATO' ? 'bg-info' :
+                                                              app.status.name() == 'ANNULLATO' ? 'bg-danger' : 'bg-secondary'
+                                                          }"
+                                                          th:text="${app.status.descrizione}">
+                                                        Stato
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <a th:href="@{/admin/appointments/{id}(id=${app.id})}" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Appuntamenti Settimana -->
+                    <div class="col-lg-6">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Prossimi 7 Giorni</h6>
+                            </div>
+                            <div class="card-body">
+                                <div th:if="${#lists.isEmpty(weekAppointments)}" class="text-center p-3">
+                                    <p class="text-muted">Nessun appuntamento programmato per la prossima settimana</p>
+                                </div>
+                                <div class="table-responsive" th:unless="${#lists.isEmpty(weekAppointments)}">
+                                    <table class="table table-striped table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Data</th>
+                                                <th>Ora</th>
+                                                <th>Professionista</th>
+                                                <th>Stato</th>
+                                                <th>Azioni</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="app : ${weekAppointments}">
+                                                <td th:text="${#temporals.format(app.dataOra, 'dd/MM')}">01/01</td>
+                                                <td th:text="${#temporals.format(app.dataOra, 'HH:mm')}">10:00</td>
+                                                <td th:text="${app.professional.nomeCompleto}">Nome Professionista</td>
+                                                <td>
+                                                    <span class="badge rounded-pill" 
+                                                          th:classappend="${
+                                                              app.status.name() == 'RICHIESTO' ? 'bg-warning' :
+                                                              app.status.name() == 'CONFERMATO' ? 'bg-success' :
+                                                              app.status.name() == 'COMPLETATO' ? 'bg-info' :
+                                                              app.status.name() == 'ANNULLATO' ? 'bg-danger' : 'bg-secondary'
+                                                          }"
+                                                          th:text="${app.status.descrizione}">
+                                                        Stato
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <a th:href="@{/admin/appointments/{id}(id=${app.id})}" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pulsanti di azione rapida -->
+                <div class="d-flex flex-wrap gap-2 mb-4">
+                    <a th:href="@{/admin/appointments}" class="btn btn-primary">
+                        <i class="fas fa-list me-1"></i> Gestisci Appuntamenti
+                    </a>
+                    <a th:href="@{/admin/professionals}" class="btn btn-outline-secondary">
+                        <i class="fas fa-user-md me-1"></i> Gestisci Professionisti
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer th:replace="fragments/footer :: footer"></footer>
+    
+    <!-- Script -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/admin.js}"></script>
+    
+    <script th:inline="javascript">
+        // Dati per il grafico
+        const requestedCount = /*[[${requestedCount}]]*/ 10;
+        const confirmedCount = /*[[${confirmedCount}]]*/ 20;
+        const completedCount = /*[[${completedCount}]]*/ 15;
+        const cancelledCount = /*[[${cancelledCount}]]*/ 5;
+        
+        // Configurazione grafico
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('appointmentsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Richiesti', 'Confermati', 'Completati', 'Annullati'],
+                    datasets: [{
+                        data: [requestedCount, confirmedCount, completedCount, cancelledCount],
+                        backgroundColor: [
+                            '#ffc107', // warning - giallo
+                            '#28a745', // success - verde
+                            '#17a2b8', // info - azzurro
+                            '#dc3545', // danger - rosso
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            fontColor: '#666',
+                            fontSize: 12,
+                            padding: 20
+                        }
+                    },
+                    tooltips: {
+                        callbacks: {
+                            label: function(tooltipItem, data) {
+                                const dataset = data.datasets[tooltipItem.datasetIndex];
+                                const total = dataset.data.reduce((previousValue, currentValue) => previousValue + currentValue);
+                                const currentValue = dataset.data[tooltipItem.index];
+                                const percentage = Math.round((currentValue/total) * 100);
+                                return `${data.labels[tooltipItem.index]}: ${currentValue} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

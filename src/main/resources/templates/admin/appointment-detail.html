@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dettaglio Appuntamento - Toby's Gift Admin</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+<body class="appointment_detail_body">
+    <!-- Include header admin -->
+    <header th:replace="fragments/header :: header"></header>
+    <nav th:replace="fragments/navigation :: navigation"></nav>
+    
+    <div class="container-fluid mt-4 mb-5">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/admin}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/admin/appointments}">Appuntamenti</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Appuntamento #<span th:text="${appointment.id}"></span></li>
+            </ol>
+        </nav>
+        
+        <!-- Alert Messages -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0">Appuntamento #<span th:text="${appointment.id}"></span></h3>
+                        <div>
+                            <span class="badge rounded-pill" 
+                                  th:classappend="${
+                                      appointment.status.name() == 'RICHIESTO' ? 'bg-warning' :
+                                      appointment.status.name() == 'CONFERMATO' ? 'bg-success' :
+                                      appointment.status.name() == 'COMPLETATO' ? 'bg-info' :
+                                      appointment.status.name() == 'ANNULLATO' ? 'bg-danger' : 'bg-secondary'
+                                  }"
+                                  th:text="${appointment.status.descrizione}">
+                                Stato
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h5>Dettagli Appuntamento</h5>
+                                <ul class="list-unstyled">
+                                    <li><strong>Data:</strong> <span th:text="${#temporals.format(appointment.dataOra, 'dd/MM/yyyy')}">01/01/2023</span></li>
+                                    <li><strong>Ora:</strong> <span th:text="${#temporals.format(appointment.dataOra, 'HH:mm')}">10:00</span></li>
+                                    <li><strong>Stato:</strong> <span th:text="${appointment.status.descrizione}">Richiesto</span></li>
+                                    <li><strong>Passato:</strong> <span th:text="${appointment.isPassato() ? 'Sì' : 'No'}">No</span></li>
+                                    <li><strong>Annullabile:</strong> <span th:text="${appointment.isAnnullabile() ? 'Sì' : 'No'}">Sì</span></li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Professionista</h5>
+                                <ul class="list-unstyled">
+                                    <li><strong>Nome:</strong> <span th:text="${appointment.professional.nomeCompleto}">Nome Professionista</span></li>
+                                    <li><strong>Tipo:</strong> <span th:text="${appointment.professional.tipo.nome}">Tipo Professionista</span></li>
+                                    <li><strong>Specializzazione:</strong> <span th:text="${appointment.professional.specializzazione}">Specializzazione</span></li>
+                                    <li><strong>Email:</strong> <span th:text="${appointment.professional.email}">email@example.com</span></li>
+                                    <li><strong>Telefono:</strong> <span th:text="${appointment.professional.telefono != null ? appointment.professional.telefono : 'Non specificato'}">123456789</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h5>Dati Cliente</h5>
+                                <ul class="list-unstyled">
+                                    <li><strong>Nome:</strong> <span th:text="${appointment.user.nome + ' ' + appointment.user.cognome}">Nome Utente</span></li>
+                                    <li><strong>Username:</strong> <span th:text="${appointment.user.username}">username</span></li>
+                                    <li><strong>Email:</strong> <span th:text="${appointment.user.email}">email@example.com</span></li>
+                                    <li><strong>Telefono:</strong> <span th:text="${appointment.user.telefono != null ? appointment.user.telefono : 'Non specificato'}">123456789</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- Note appuntamento -->
+                        <div class="mb-4" th:if="${appointment.note != null && !appointment.note.isEmpty()}">
+                            <h5>Note</h5>
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <p class="card-text" th:text="${appointment.note}">Note dell'appuntamento</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pulsanti azioni rapide -->
+                <div class="d-flex flex-wrap gap-2 mb-4">
+                    <a th:href="@{/admin/appointments}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> Torna alla lista
+                    </a>
+                    
+                    <!-- Pulsante Conferma -->
+                    <form th:if="${appointment.status.name() == 'RICHIESTO' && !appointment.isPassato()}" 
+                          th:action="@{/admin/appointments/{id}/confirm(id=${appointment.id})}" method="post" class="d-inline">
+                        <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-check me-1"></i> Conferma
+                        </button>
+                    </form>
+                    
+                    <!-- Pulsante Completa -->
+                    <form th:if="${appointment.status.name() == 'CONFERMATO'}" 
+                          th:action="@{/admin/appointments/{id}/complete(id=${appointment.id})}" method="post" class="d-inline">
+                        <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                        <button type="submit" class="btn btn-info">
+                            <i class="fas fa-clipboard-check me-1"></i> Completa
+                        </button>
+                    </form>
+                    
+                    <!-- Pulsante Annulla -->
+                    <form th:if="${appointment.isAnnullabile()}" 
+                          th:action="@{/admin/appointments/{id}/cancel(id=${appointment.id})}" method="post" class="d-inline">
+                        <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-times me-1"></i> Annulla
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Gestione Appuntamento</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Form per aggiornare lo stato dell'appuntamento -->
+                        <form th:action="@{/admin/appointments/{id}/update-status(id=${appointment.id})}" method="post" class="mb-4">
+                            <div class="mb-3">
+                                <label for="status" class="form-label">Stato Appuntamento:</label>
+                                <select class="form-select" id="status" name="status">
+                                    <option th:each="statusItem : ${statuses}" 
+                                            th:value="${statusItem}" 
+                                            th:text="${statusItem.descrizione}"
+                                            th:selected="${appointment.status == statusItem}"></option>
+                                </select>
+                            </div>
+                            <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+                            <button type="submit" class="btn btn-primary">Aggiorna Stato</button>
+                        </form>
+                        
+                        <hr>
+                        
+                        <!-- Informazioni aggiuntive sugli stati -->
+                        <div class="mb-3">
+                            <h6>Stati Appuntamento</h6>
+                            <div class="list-group">
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="badge bg-warning me-2">RICHIESTO</span>
+                                        <small>Appuntamento richiesto dall'utente, in attesa di conferma</small>
+                                    </div>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="badge bg-success me-2">CONFERMATO</span>
+                                        <small>Appuntamento confermato dall'amministratore</small>
+                                    </div>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="badge bg-info me-2">COMPLETATO</span>
+                                        <small>Appuntamento avvenuto e completato</small>
+                                    </div>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="badge bg-danger me-2">ANNULLATO</span>
+                                        <small>Appuntamento annullato dall'utente o dall'amministratore</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer th:replace="fragments/footer :: footer"></footer>
+    
+    <!-- Script -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/admin.js}"></script>
+</body>
+</html>

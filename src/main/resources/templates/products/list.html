@@ -174,7 +174,7 @@
                 </div>
                 
                 <!-- Paginazione -->
-                <nav th:if="${page.totalPages > 1}" aria-label="Paginazione prodotti">
+                <nav class="nav_paginazione_products" th:if="${page.totalPages > 1}" aria-label="Paginazione prodotti">
                     <ul class="pagination justify-content-center">
                         <li class="page-item" th:classappend="${page.first ? 'disabled' : ''}">
                             <a class="page-link" th:href="@{/products(page=${page.number - 1}, size=${page.size}, sort=${sort}, search=${search}, categoryId=${categoryId})}" aria-label="Precedente">

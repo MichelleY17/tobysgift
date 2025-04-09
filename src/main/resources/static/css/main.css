@@ -6,11 +6,14 @@
     --color4:#297373;
     --color5: #3A3335;
 }
-.login_body, .register_body, .products_body, .list_body, .body_detail_product, .admin_body, .list_professionals_body, .professionals_body,.orders_admin_body, .dashboard_body, .detail_professional_admin{
+.login_body, .register_body, .products_body, .list_body, .body_detail_product, .admin_body, .list_professionals_body, .professionals_body,.orders_admin_body, .dashboard_body, .detail_professional_admin,.appointments_admin_body, .appointments_dashboard_body, .appointment_detail_body{
     background: var(--backgroun-main);
 }
 body{
     color: var(--color2);
+}
+.list_body .nav_paginazione_products{
+    width: 100%;
 }
 header{
     background: var(--color1);

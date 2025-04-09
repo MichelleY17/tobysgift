@@ -57,15 +57,22 @@ public class AdminAppointmentController {
         @RequestParam(defaultValue = "" + DEFAULT_PAGE_SIZE) int size,
         @RequestParam(required = false) String status,
         @RequestParam(required = false) Long professionalId,
-        @RequestParam(required = false) String date
+        @RequestParam(required = false) String date,
+        @RequestParam(defaultValue = "dataOra,desc") String sort
     ) {
         try {
             // Validazione parametri
             page = Math.max(0, page);
             size = Math.min(Math.max(1, size), 100);
             
-            // Configurazione paginazione
-            Pageable pageable = PageRequest.of(page, size, Sort.by("dataOra").descending());
+            // Parsing del parametro di ordinamento
+            String[] sortParams = sort.split(",");
+            String sortField = sortParams[0];
+            Sort.Direction sortDirection = sortParams.length > 1 && sortParams[1].equalsIgnoreCase("desc") ? 
+                                          Sort.Direction.DESC : Sort.Direction.ASC;
+            
+            // Creazione dell'oggetto Pageable
+            Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortField));
             
             // Filtraggio appuntamenti
             Page<Appointment> appointmentsPage;
@@ -124,8 +131,9 @@ public class AdminAppointmentController {
             model.addAttribute("professionals", professionals);
             model.addAttribute("selectedProfessionalId", professionalId);
             model.addAttribute("date", date);
+            model.addAttribute("sort", sort);
             
-            return "admin/appointments/list";
+            return "admin/appointments";
         } catch (Exception e) {
             logger.error("Errore nel recupero degli appuntamenti", e);
             model.addAttribute("errorMessage", "Si è verificato un errore nel recupero degli appuntamenti");
@@ -150,8 +158,9 @@ public class AdminAppointmentController {
                 
                 // Preparazione modello
                 model.addAttribute("appointment", appointment);
+                model.addAttribute("statuses", AppointmentStatus.values());
                 
-                return "admin/appointments/detail";
+                return "admin/appointment-detail";
             } else {
                 logger.warn("Appuntamento non trovato con ID: {}", id);
                 return "redirect:/admin/appointments";
@@ -278,6 +287,71 @@ public class AdminAppointmentController {
     }
     
     /**
+     * Aggiorna lo stato di un appuntamento
+     */
+    @PostMapping("/{id}/update-status")
+    public String updateAppointmentStatus(
+        @PathVariable Long id,
+        @RequestParam("status") String statusStr,
+        RedirectAttributes redirectAttributes
+    ) {
+        try {
+            AppointmentStatus newStatus = AppointmentStatus.valueOf(statusStr);
+            
+            // Trova l'appuntamento
+            Optional<Appointment> appointmentOpt = appointmentService.findById(id);
+            
+            if (appointmentOpt.isPresent()) {
+                Appointment appointment = appointmentOpt.get();
+                
+                // Verifica se lo stato è cambiato
+                if (appointment.getStatus() != newStatus) {
+                    boolean success = false;
+                    
+                    // Applica la transizione di stato appropriata
+                    switch (newStatus) {
+                        case CONFERMATO:
+                            success = appointment.conferma();
+                            break;
+                        case COMPLETATO:
+                            success = appointment.completa();
+                            break;
+                        case ANNULLATO:
+                            success = appointment.annulla();
+                            break;
+                        default:
+                            redirectAttributes.addFlashAttribute("errorMessage", 
+                                "Transizione di stato non supportata");
+                            return "redirect:/admin/appointments/" + id;
+                    }
+                    
+                    if (success) {
+                        appointmentService.save(appointment);
+                        redirectAttributes.addFlashAttribute("successMessage", 
+                            "Stato dell'appuntamento aggiornato a: " + newStatus.getDescrizione());
+                    } else {
+                        redirectAttributes.addFlashAttribute("errorMessage", 
+                            "Impossibile aggiornare lo stato dell'appuntamento a " + newStatus.getDescrizione());
+                    }
+                }
+            } else {
+                redirectAttributes.addFlashAttribute("errorMessage", "Appuntamento non trovato");
+            }
+            
+            return "redirect:/admin/appointments/" + id;
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", 
+                "Stato dell'appuntamento non valido: " + statusStr);
+            return "redirect:/admin/appointments/" + id;
+        } catch (Exception e) {
+            logger.error("Errore nell'aggiornamento dello stato dell'appuntamento", e);
+            redirectAttributes.addFlashAttribute("errorMessage", 
+                "Si è verificato un errore durante l'aggiornamento dello stato dell'appuntamento: " + e.getMessage());
+            return "redirect:/admin/appointments/" + id;
+        }
+    }
+    
+    /**
      * Dashboard appuntamenti
      */
     @GetMapping("/dashboard")
@@ -310,7 +384,7 @@ public class AdminAppointmentController {
             model.addAttribute("weekAppointments", weekAppointments);
             model.addAttribute("topProfessionals", topProfessionals);
             
-            return "admin/appointments/dashboard";
+            return "admin/appointments-dashboard";
         } catch (Exception e) {
             logger.error("Errore nel recupero dei dati per la dashboard", e);
             model.addAttribute("errorMessage", "Si è verificato un errore nel recupero dei dati");
